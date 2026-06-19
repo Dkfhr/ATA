@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atlas Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0e0e12;
+    color: #e8e4df;
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px 80px;
+  }
+  h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #7a9a6a; margin-bottom: 8px; }
+  .subtitle { color: #7a7570; font-size: 0.9rem; margin-bottom: 40px; text-align: center; max-width: 540px; line-height: 1.6; }
+
+  .steps { width: 100%; max-width: 580px; }
+
+  .step {
+    background: #14141c;
+    border: 1px solid #1e1e26;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .step-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .step-num {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: #1a1a24; border: 1px solid #2a2a34;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem; color: #7a9a6a; flex-shrink: 0;
+  }
+  .step-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: #e8e4df; }
+  .step p { color: #9a958e; font-size: 0.85rem; line-height: 1.6; margin-bottom: 12px; }
+
+  .file-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 20px; background: rgba(122,154,106,0.12);
+    border: 1px solid #3a4a32; color: #7a9a6a; border-radius: 8px;
+    font-size: 0.85rem; cursor: pointer; transition: background 0.2s;
+    font-family: inherit;
+  }
+  .file-btn:hover { background: rgba(122,154,106,0.22); }
+
+  .status { margin-top: 10px; font-size: 0.8rem; min-height: 20px; }
+  .status.ok { color: #7a9a6a; }
+  .status.error { color: #c07060; }
+  .status.warn { color: #b0a060; }
+
+  button.build-btn {
+    width: 100%; padding: 16px; background: #5a6a50; border: none;
+    color: #e8e4df; border-radius: 10px; font-size: 1rem;
+    font-family: inherit; cursor: pointer; transition: background 0.2s; margin-top: 8px;
+  }
+  button.build-btn:hover { background: #7a9a6a; }
+  button.build-btn:disabled { background: #2a2a34; color: #5a5a5a; cursor: default; }
+
+  .progress { width: 100%; height: 6px; background: #1a1a24; border-radius: 3px; overflow: hidden; margin-top: 14px; }
+  .progress-bar { height: 100%; background: #7a9a6a; width: 0%; transition: width 0.2s; border-radius: 3px; }
+  #buildStatus { margin-top: 10px; font-size: 0.82rem; color: #7a7570; min-height: 22px; }
+
+  /* ── Build report ── */
+  .report {
+    width: 100%; max-width: 580px; margin-top: 24px;
+    background: #14141c; border: 1px solid #1e1e26; border-radius: 12px;
+    padding: 24px; display: none;
+  }
+  .report.active { display: block; }
+  .report h3 { font-family: 'Playfair Display', serif; font-size: 1rem; color: #7a9a6a; margin-bottom: 14px; }
+  .report pre {
+    background: #0e0e12; border: 1px solid #1e1e26; border-radius: 8px;
+    padding: 16px; color: #c8c4be; font-size: 0.78rem; line-height: 1.7;
+    white-space: pre-wrap; word-wrap: break-word; max-height: 400px; overflow-y: auto;
+    font-family: 'Consolas', 'Monaco', monospace;
+  }
+  .report .dl-btn {
+    margin-top: 12px; display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 16px; background: rgba(122,154,106,0.12);
+    border: 1px solid #3a4a32; color: #7a9a6a; border-radius: 8px;
+    font-size: 0.8rem; cursor: pointer; text-decoration: none;
+  }
+  .report .dl-btn:hover { background: rgba(122,154,106,0.22); }
+
+  /* ── Parsed preview ── */
+  .preview { margin-top: 14px; font-size: 0.75rem; color: #7a7570; line-height: 1.6; }
+  .preview strong { color: #9a958e; }
+</style>
+</head>
+<body>
+
+<h1>Atlas Builder</h1>
+<p class="subtitle">Select your atlas folder. It should contain a plan file whose name ends in "Plan" (like <code>Tree Atlas Plan.txt</code>) and your media files — photos, audio, video, text, or HTML. Atlas Builder reads the plan, finds the media, and produces a single self-contained HTML atlas. Note: audio and video files greatly increase atlas size and load time. Use them sparingly, only where they make a real difference to the reader's experience.</p>
+
+<div class="steps">
+
+  <!-- STEP 1: Select folder -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div class="step-title">Select your atlas folder</div>
+    </div>
+    <p>Choose the folder that contains your plan file(s) and media folders/files.
+When the file picker opens, navigate to your atlas folder and click it.
+If you have any media folders in it, they'll show;
+if not, the file picker will show nothing, and complain that
+"No items match your search". Ignore the message
+and tap the <strong>Upload</strong> or <strong>Select</strong> button at lower-right.
+Then confirm that you trust the site.
+I will show a summary of what has been uploaded.</p>
+    <label class="file-btn">
+      📂 Select Folder
+      <input type="file" id="folderInput" webkitdirectory style="display:none;">
+    </label>
+    <div class="status" id="folderStatus"></div>
+  </div>
+
+  <!-- STEP 2: Select plan file -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div class="step-title">Which file is your plan?</div>
+    </div>
+    <p>Choose the plan file from the list. It's the <code>.txt</code> file that defines your atlas columns, rows, and captions.</p>
+    <select id="planSelect" disabled style="width:100%; background:#0e0e12; border:1px solid #2a2a34; border-radius:8px; padding:10px 14px; color:#e8e4df; font-size:0.88rem; font-family:inherit; outline:none; opacity:0.5; cursor:not-allowed;">
+      <option value="" disabled selected>— select folder first —</option>
+    </select>
+    <div class="status" id="planStatus"></div>
+    <div class="preview" id="planPreview"></div>
+  </div>
+
+  <!-- STEP 2.5: Build mode -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div class="step-title">Choose build mode</div>
+    </div>
+    <p><strong>Offline:</strong> all media embedded in one self-contained HTML file. Large file, slow to open, but works anywhere with no internet.
+    <br><strong>Online:</strong> small HTML file that downloads media from a server when opened. User needs wifi for initial load, then works offline until the tab is closed.</p>
+    <div style="display:flex;gap:10px;margin-bottom:12px">
+      <button class="file-btn" id="modeOffline" style="flex:1;justify-content:center;border-color:#7a9a6a;background:rgba(122,154,106,0.22)">Offline</button>
+      <button class="file-btn" id="modeOnline" style="flex:1;justify-content:center">Online</button>
+    </div>
+    <div id="baseUrlWrap" style="display:none">
+      <p style="margin-bottom:8px">Enter the base URL where your media files will be hosted. The atlas will fetch files like <code>baseURL/Cardon.tree.jpg</code>.</p>
+      <input type="text" id="baseUrlInput" placeholder="https://example.com/my-atlas/" style="width:100%;background:#0e0e12;border:1px solid #2a2a34;border-radius:8px;padding:10px 14px;color:#e8e4df;font-size:0.88rem;font-family:inherit;outline:none">
+      <div class="status" id="baseUrlStatus"></div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Build -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div class="step-title">Build your atlas</div>
+    </div>
+    <p>Atlas Builder will match media to columns and rows and build your atlas. A build report will show any issues found.</p>
+    <button class="build-btn" id="buildBtn" disabled>Build Atlas</button>
+    <div class="progress"><div class="progress-bar" id="bar"></div></div>
+    <div id="buildStatus"></div>
+  </div>
+
+</div>
+
+<!-- Build report -->
+<div class="report" id="reportSection">
+  <h3>Build Report</h3>
+  <pre id="reportText"></pre>
+  <a class="dl-btn" id="reportDl" href="#" download="Build Report.txt">📄 Download Build Report</a>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// UTILITIES
+// ══════════════════════════════════════════════════════════
+function norm(s) {
+  return s.toLowerCase().replace(/[\s_\-]+/g, ' ');
+}
+
+// ══════════════════════════════════════════════════════════
+// MEDIA TYPE DEFINITIONS
+// ══════════════════════════════════════════════════════════
+const IMG_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'];
+const VIDEO_EXTS = ['mp4', 'webm', 'mov'];
+const AUDIO_EXTS = ['mp3', 'm4a', 'ogg', 'wav'];
+const TEXT_EXTS = ['txt'];
+const HTML_EXTS = ['html', 'htm'];
+const ALL_MEDIA_EXTS = [...IMG_EXTS, ...VIDEO_EXTS, ...AUDIO_EXTS, ...TEXT_EXTS, ...HTML_EXTS];
+
+function classifyExt(ext) {
+  ext = ext.toLowerCase();
+  if (IMG_EXTS.includes(ext)) return 'image';
+  if (VIDEO_EXTS.includes(ext)) return 'video';
+  if (AUDIO_EXTS.includes(ext)) return 'audio';
+  if (TEXT_EXTS.includes(ext)) return 'text';
+  if (HTML_EXTS.includes(ext)) return 'html';
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let allFiles = {};        // relativePath → File
+let planTxtFiles = [];    // list of .txt file paths (candidates for plan file)
+let mediaFiles = {};      // lowercase key → { file, path, category }
+let planData = null;
+let buildMode = 'offline'; // 'offline' or 'online'
+
+const planSelect = document.getElementById('planSelect');
+const folderStatus = document.getElementById('folderStatus');
+const planStatus = document.getElementById('planStatus');
+const planPreview = document.getElementById('planPreview');
+const buildBtn = document.getElementById('buildBtn');
+const buildStatus = document.getElementById('buildStatus');
+const bar = document.getElementById('bar');
+const reportSection = document.getElementById('reportSection');
+const reportText = document.getElementById('reportText');
+const reportDl = document.getElementById('reportDl');
+const modeOfflineBtn = document.getElementById('modeOffline');
+const modeOnlineBtn = document.getElementById('modeOnline');
+const baseUrlWrap = document.getElementById('baseUrlWrap');
+const baseUrlInput = document.getElementById('baseUrlInput');
+
+// ══════════════════════════════════════════════════════════
+// MODE TOGGLE
+// ══════════════════════════════════════════════════════════
+modeOfflineBtn.addEventListener('click', () => {
+  buildMode = 'offline';
+  modeOfflineBtn.style.borderColor = '#7a9a6a';
+  modeOfflineBtn.style.background = 'rgba(122,154,106,0.22)';
+  modeOnlineBtn.style.borderColor = '#3a4a32';
+  modeOnlineBtn.style.background = 'rgba(122,154,106,0.12)';
+  baseUrlWrap.style.display = 'none';
+  checkReady();
+});
+
+modeOnlineBtn.addEventListener('click', () => {
+  buildMode = 'online';
+  modeOnlineBtn.style.borderColor = '#7a9a6a';
+  modeOnlineBtn.style.background = 'rgba(122,154,106,0.22)';
+  modeOfflineBtn.style.borderColor = '#3a4a32';
+  modeOfflineBtn.style.background = 'rgba(122,154,106,0.12)';
+  baseUrlWrap.style.display = 'block';
+  checkReady();
+});
+
+baseUrlInput.addEventListener('input', checkReady);
+
+// ══════════════════════════════════════════════════════════
+// STEP 1: Read folder
+// ══════════════════════════════════════════════════════════
+const folderInput = document.getElementById('folderInput');
+
+folderInput.addEventListener('click', () => {
+  folderInput._picking = true;
+});
+
+window.addEventListener('focus', () => {
+  if (folderInput._picking) {
+    folderInput._picking = false;
+    setTimeout(() => {
+      if (folderStatus.className !== 'status ok') {
+        folderStatus.textContent = '⏳ Reading files from folder… please wait';
+        folderStatus.className = 'status warn';
+      }
+    }, 500);
+  }
+});
+
+folderInput.addEventListener('change', (e) => {
+  try {
+    folderStatus.textContent = '⏳ Scanning files…';
+    folderStatus.className = 'status warn';
+
+    allFiles = {};
+    planTxtFiles = [];
+    mediaFiles = {};
+
+    let imgCount = 0, vidCount = 0, audCount = 0, txtCount = 0, htmlCount = 0;
+
+    for (const f of e.target.files) {
+      const path = f.webkitRelativePath || f.name;
+      allFiles[path] = f;
+      const name = f.name.toLowerCase();
+      const dotIdx = name.lastIndexOf('.');
+      if (dotIdx < 0) continue;
+      const ext = name.substring(dotIdx + 1);
+
+      // .txt files ending in "Plan" or "plan" (before the extension) are plan file candidates
+      // All other .txt files are cell text content only
+      if (ext === 'txt') {
+        const baseName = f.name.substring(0, dotIdx);
+        if (/[Pp]lan$/.test(baseName)) {
+          planTxtFiles.push(path);
+        }
+      }
+
+      const category = classifyExt(ext);
+      if (category) {
+        mediaFiles[f.name.toLowerCase()] = { file: f, path, category };
+        mediaFiles[path.toLowerCase()] = { file: f, path, category };
+        if (category === 'image') imgCount++;
+        else if (category === 'video') vidCount++;
+        else if (category === 'audio') audCount++;
+        else if (category === 'text') txtCount++;
+        else if (category === 'html') htmlCount++;
+      }
+    }
+
+    const totalFiles = Object.keys(allFiles).length;
+    const parts = [];
+    if (imgCount) parts.push(`${imgCount} images`);
+    if (vidCount) parts.push(`${vidCount} videos`);
+    if (audCount) parts.push(`${audCount} audio`);
+    if (txtCount) parts.push(`${txtCount} text`);
+    if (htmlCount) parts.push(`${htmlCount} html`);
+    folderStatus.textContent = `✓ ${totalFiles} files found (${parts.join(', ')})`;
+    folderStatus.className = 'status ok';
+
+    planSelect.innerHTML = '<option value="" disabled selected>— choose your plan file —</option>';
+    planTxtFiles.forEach(p => {
+      const o = document.createElement('option');
+      o.value = p;
+      o.textContent = p;
+      planSelect.appendChild(o);
+    });
+    planSelect.disabled = false;
+    planSelect.style.opacity = '1';
+    planSelect.style.cursor = '';
+
+    planData = null;
+    planStatus.textContent = '';
+    planPreview.innerHTML = '';
+    checkReady();
+  } catch (err) {
+    folderStatus.textContent = '✗ Error reading folder: ' + err.message;
+    folderStatus.className = 'status error';
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+// STEP 2: Parse plan file
+// ══════════════════════════════════════════════════════════
+planSelect.addEventListener('change', async () => {
+  const path = planSelect.value;
+  if (!path) { planData = null; planStatus.textContent = ''; planPreview.innerHTML = ''; checkReady(); return; }
+
+  const file = allFiles[path];
+  if (!file) { planStatus.textContent = '✗ File not found'; planStatus.className = 'status error'; return; }
+
+  try {
+    const text = await file.text();
+    planData = parsePlan(text);
+    planStatus.textContent = `✓ Parsed: "${planData.atlasName}" — ${planData.columns.length} columns × ${planData.rows.length} rows = ${planData.columns.length * planData.rows.length} cells`;
+    planStatus.className = 'status ok';
+
+    let html = `<strong>Atlas:</strong> ${planData.atlasName}<br>`;
+    html += `<strong>Columns:</strong> ${planData.columns.join(', ')}<br>`;
+    html += `<strong>Rows:</strong> ${planData.rows.join(', ')}<br>`;
+    const captionCount = Object.keys(planData.captions).length;
+    html += `<strong>Captions defined for:</strong> ${captionCount} column(s)`;
+    planPreview.innerHTML = html;
+
+    checkReady();
+  } catch (err) {
+    planStatus.textContent = '✗ ' + err.message;
+    planStatus.className = 'status error';
+    planData = null;
+    planPreview.innerHTML = '';
+    checkReady();
+  }
+});
+
+// ══════════════════════════════════════════════════════════
+// PLAN PARSER (unchanged from v14)
+// ══════════════════════════════════════════════════════════
+function parsePlan(text) {
+  const lines = text.split(/\r?\n/);
+  const result = {
+    atlasName: 'Atlas',
+    columns: [],
+    rows: [],
+    captions: {}
+  };
+
+  let section = null;
+  let currentCapCol = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    let line = lines[i];
+    line = stripInlineComment(line);
+    line = line.trim();
+    if (!line) continue;
+
+    if (/^Atlas\s+Name\s*:/i.test(line)) {
+      result.atlasName = line.replace(/^Atlas\s+Name\s*:\s*/i, '').trim();
+      section = null;
+      continue;
+    }
+
+    if (/^Column\s*:/i.test(line)) {
+      const rest = line.replace(/^Column\s*:\s*/i, '').trim();
+      if (rest) result.columns.push(...splitList(rest));
+      section = 'column';
+      continue;
+    }
+
+    if (/^Row\s*:/i.test(line)) {
+      const rest = line.replace(/^Row\s*:\s*/i, '').trim();
+      if (rest) result.rows.push(...splitList(rest));
+      section = 'row';
+      continue;
+    }
+
+    if (/^Caption\s*:/i.test(line)) {
+      section = 'caption';
+      currentCapCol = null;
+      continue;
+    }
+
+    if (section === 'column') { result.columns.push(...splitList(line)); continue; }
+    if (section === 'row') { result.rows.push(...splitList(line)); continue; }
+
+    if (section === 'caption') {
+      const colonMatch = line.match(/^(.+?)\s*:\s*(.*)$/);
+      if (colonMatch) {
+        const key = colonMatch[1].trim();
+        const value = colonMatch[2].trim();
+
+        if (result.columns.some(c => norm(c) === norm(key))) {
+          currentCapCol = key;
+          if (!result.captions[currentCapCol]) result.captions[currentCapCol] = {};
+          continue;
+        }
+
+        if (currentCapCol) {
+          if (!result.captions[currentCapCol]) result.captions[currentCapCol] = {};
+          if (key.toLowerCase() === 'subtitle') {
+            result.captions[currentCapCol].subtitle = value;
+          } else {
+            result.captions[currentCapCol][norm(key)] = value;
+          }
+        }
+      }
+      continue;
+    }
+  }
+
+  result.columns = result.columns.filter(c => c && !/^(\.{2,}|etc\.?\.?)$/i.test(c));
+  result.rows = result.rows.filter(r => r && !/^(\.{2,}|etc\.?\.?)$/i.test(r));
+
+  if (result.columns.length === 0) throw new Error('No columns found. Make sure you have a "Column:" line followed by comma-separated names.');
+  if (result.rows.length === 0) throw new Error('No rows found. Make sure you have a "Row:" line followed by comma-separated names.');
+
+  return result;
+}
+
+function stripInlineComment(line) {
+  let result = '';
+  let i = 0;
+  while (i < line.length) {
+    if (line[i] === '/' && line[i + 1] === '/') {
+      if (i > 0 && line[i - 1] === ':') {
+        result += line[i];
+        i++;
+      } else {
+        break;
+      }
+    } else {
+      result += line[i];
+      i++;
+    }
+  }
+  return result;
+}
+
+function splitList(str) {
+  return str.split(',').map(s => s.trim()).filter(s => s.length > 0);
+}
+
+// ══════════════════════════════════════════════════════════
+// READY CHECK
+// ══════════════════════════════════════════════════════════
+function checkReady() {
+  if (buildMode === 'online') {
+    buildBtn.disabled = !planData || !baseUrlInput.value.trim();
+  } else {
+    buildBtn.disabled = !planData;
+  }
+}
+
+// ══════════════════════════════════════════════════════════
+// GENERALIZED MEDIA FINDER
+// ══════════════════════════════════════════════════════════
+// Returns { image: {file,path}, video: {file,path}, audio: {file,path},
+//           text: {file,path}, html: {file,path} }
+// Each key is present only if a matching file was found.
+function findMedia(colName, rowName) {
+  const nCol = norm(colName);
+  const nRow = norm(rowName);
+  const found = {};
+
+  for (const ext of ALL_MEDIA_EXTS) {
+    const category = classifyExt(ext);
+    if (found[category]) continue; // already found one for this category
+
+    // Strategy 1: flat file — "Column Name.row name.ext"
+    const nFlat = nCol + '.' + nRow + '.' + ext;
+    for (const [key, val] of Object.entries(mediaFiles)) {
+      const parts = key.split('/');
+      const fileName = norm(parts[parts.length - 1]);
+      if (fileName === nFlat) {
+        found[category] = { file: val.file, path: val.path, wrongFolder: false };
+        break;
+      }
+    }
+    if (found[category]) continue;
+
+    // Strategy 2: subfolder — "Column Name/row name.ext"
+    const nSub = nRow + '.' + ext;
+    for (const [key, val] of Object.entries(mediaFiles)) {
+      const parts = key.split('/');
+      if (parts.length >= 2) {
+        const folderName = norm(parts[parts.length - 2]);
+        const fileName = norm(parts[parts.length - 1]);
+        if (folderName === nCol && fileName === nSub) {
+          found[category] = { file: val.file, path: val.path, wrongFolder: false };
+          break;
+        }
+      }
+    }
+    if (found[category]) continue;
+
+    // Strategy 3: wrong folder fallback
+    for (const [key, val] of Object.entries(mediaFiles)) {
+      const parts = key.split('/');
+      const fileName = norm(parts[parts.length - 1]);
+      if (fileName === nFlat) {
+        found[category] = { file: val.file, path: val.path, wrongFolder: true };
+        break;
+      }
+    }
+    if (found[category]) continue;
+
+    for (const [key, val] of Object.entries(mediaFiles)) {
+      const parts = key.split('/');
+      if (parts.length >= 2) {
+        const folderName = norm(parts[parts.length - 2]);
+        const fileName = norm(parts[parts.length - 1]);
+        if (fileName === nSub && folderName !== nCol) {
+          found[category] = { file: val.file, path: val.path, wrongFolder: true };
+          break;
+        }
+      }
+    }
+  }
+
+  return found;
+}
+
+function findCaptionBlock(captions, colName) {
+  const nCol = norm(colName);
+  for (const key of Object.keys(captions)) {
+    if (norm(key) === nCol) return captions[key];
+  }
+  return null;
+}
+
+// ══════════════════════════════════════════════════════════
+// ENCODING HELPERS
+// ══════════════════════════════════════════════════════════
+function imageToDataURL(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const TARGET_W = 900, TARGET_H = 1600;
+      const canvas = document.createElement('canvas');
+      canvas.width = TARGET_W;
+      canvas.height = TARGET_H;
+      const ctx = canvas.getContext('2d');
+      const scale = Math.max(TARGET_W / img.width, TARGET_H / img.height);
+      const sw = TARGET_W / scale, sh = TARGET_H / scale;
+      const sx = (img.width - sw) / 2, sy = (img.height - sh) / 2;
+      ctx.drawImage(img, sx, sy, sw, sh, 0, 0, TARGET_W, TARGET_H);
+      resolve(canvas.toDataURL('image/jpeg', 0.85));
+      URL.revokeObjectURL(img.src);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(img.src);
+      reject(new Error('Failed to load image: ' + file.name));
+    };
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+function fileToBase64DataURL(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = () => reject(new Error('Failed to read file: ' + file.name));
+    reader.readAsDataURL(file);
+  });
+}
+
+function fileToText(file) {
+  return file.text();
+}
+
+// Extract just the filename from a relative path
+function mediaFileName(path) {
+  const parts = path.split('/');
+  return parts[parts.length - 1];
+}
+
+// ══════════════════════════════════════════════════════════
+// STEP 4: BUILD
+// ══════════════════════════════════════════════════════════
+buildBtn.addEventListener('click', async () => {
+  buildBtn.disabled = true;
+  bar.style.width = '0%';
+  reportSection.classList.remove('active');
+
+  const isOnline = buildMode === 'online';
+  let baseUrl = '';
+  if (isOnline) {
+    baseUrl = baseUrlInput.value.trim();
+    if (!baseUrl.endsWith('/')) baseUrl += '/';
+  }
+
+  const report = [];
+  const warnings = [];
+
+  report.push('═══════════════════════════════════════');
+  report.push('ATLAS BUILD REPORT');
+  report.push('═══════════════════════════════════════');
+  report.push('');
+  report.push(`Atlas Name: ${planData.atlasName}`);
+  report.push(`Build Mode: ${isOnline ? 'Online (base URL: ' + baseUrl + ')' : 'Offline (embedded)'}`);
+  report.push(`Columns: ${planData.columns.length} — ${planData.columns.join(', ')}`);
+  report.push(`Rows: ${planData.rows.length} — ${planData.rows.join(', ')}`);
+  report.push(`Total cells: ${planData.columns.length * planData.rows.length}`);
+  report.push('');
+
+  // Check for columns declared but missing from Caption section
+  const captionCols = Object.keys(planData.captions);
+  for (const col of planData.columns) {
+    if (!captionCols.some(c => norm(c) === norm(col))) {
+      warnings.push(`Column "${col}" has no captions defined in the Caption section.`);
+    }
+  }
+  for (const cc of captionCols) {
+    if (!planData.columns.some(c => norm(c) === norm(cc))) {
+      warnings.push(`Caption section references "${cc}" which is not in the Column list. It will be ignored.`);
+    }
+  }
+
+  const colNames = planData.columns;
+  const colLatin = [];
+  const cells = [];
+  const totalCells = planData.columns.length * planData.rows.length;
+  let processed = 0;
+
+  // Counters for report
+  let stats = { photo: 0, 'photo+audio': 0, video: 0, text: 0, 'text+audio': 0, html: 0, audio: 0, na: 0, empty: 0 };
+
+  buildStatus.textContent = 'Searching for media…';
+
+  for (let ci = 0; ci < planData.columns.length; ci++) {
+    const colName = planData.columns[ci];
+    const colCaptions = findCaptionBlock(planData.captions, colName) || {};
+    colLatin.push(colCaptions.subtitle || '');
+    cells.push([]);
+
+    for (let ri = 0; ri < planData.rows.length; ri++) {
+      const rowName = planData.rows[ri];
+      const planCaption = colCaptions[norm(rowName)] || '';
+      const isNA = planCaption.toLowerCase() === 'n/a';
+      // Caption to use: if plan says n/a, treat as no caption (empty string)
+      const effectiveCaption = isNA ? '' : planCaption;
+
+      // Default cell
+      let cell = { type: 'na', caption: planCaption };
+
+      // Always check for media files, even when plan says n/a —
+      // a file like Cardon.display.txt overrides the n/a designation
+      const media = findMedia(colName, rowName);
+
+      // Report wrong-folder finds
+      for (const [cat, m] of Object.entries(media)) {
+        if (m.wrongFolder) {
+          warnings.push(`${cat} file for "${colName}.${rowName}" found in unexpected location: ${m.path}. Used anyway.`);
+        }
+      }
+
+      const hasMedia = Object.keys(media).length > 0;
+
+      if (isNA && !hasMedia) {
+        // Truly n/a: plan says n/a and no media files found
+        stats.na++;
+        cells[ci].push(cell);
+        processed++;
+        bar.style.width = (processed / totalCells * 90) + '%';
+        await new Promise(r => setTimeout(r, 0));
+        continue;
+      }
+
+      buildStatus.textContent = `Processing: ${colName} / ${rowName}…`;
+
+      // ── Apply combination rules ──
+
+      if (media.video) {
+        // VIDEO: takes over the cell. Warn about anything else present.
+        const ignoredTypes = Object.keys(media).filter(k => k !== 'video');
+        for (const ig of ignoredTypes) {
+          warnings.push(`Video found for "${colName}.${rowName}" — ignoring ${ig} file: ${media[ig].path}`);
+        }
+        if (isOnline) {
+          cell = { type: 'video', url: baseUrl + encodeURIComponent(mediaFileName(media.video.path)), caption: effectiveCaption };
+        } else {
+          const videoSrc = await fileToBase64DataURL(media.video.file);
+          cell = { type: 'video', src: videoSrc, caption: effectiveCaption };
+        }
+        stats.video++;
+
+      } else if (media.image) {
+        let imgSrc;
+        let imgUrl;
+        if (isOnline) {
+          imgUrl = baseUrl + encodeURIComponent(mediaFileName(media.image.path));
+        } else {
+          imgSrc = await imageToDataURL(media.image.file);
+        }
+
+        if (media.text && media.audio) {
+          // PHOTO + TEXT + AUDIO
+          const txtContent = await fileToText(media.text.file);
+          if (effectiveCaption) {
+            warnings.push(`"${colName}.${rowName}" has a .txt file AND a plan-file caption — using the .txt file as caption.`);
+          }
+          if (isOnline) {
+            cell = { type: 'photo+audio', url: imgUrl, audioUrl: baseUrl + encodeURIComponent(mediaFileName(media.audio.path)), caption: txtContent };
+          } else {
+            const audioSrc = await fileToBase64DataURL(media.audio.file);
+            cell = { type: 'photo+audio', src: imgSrc, audio: audioSrc, caption: txtContent };
+          }
+          stats['photo+audio']++;
+
+        } else if (media.text) {
+          // PHOTO + TEXT — txt overrides plan caption
+          const txtContent = await fileToText(media.text.file);
+          if (effectiveCaption) {
+            warnings.push(`"${colName}.${rowName}" has a .txt file AND a plan-file caption — using the .txt file as caption.`);
+          }
+          if (isOnline) {
+            cell = { type: 'photo', url: imgUrl, caption: txtContent };
+          } else {
+            cell = { type: 'photo', src: imgSrc, caption: txtContent };
+          }
+          stats.photo++;
+
+        } else if (media.audio) {
+          // PHOTO + AUDIO
+          if (isOnline) {
+            cell = { type: 'photo+audio', url: imgUrl, audioUrl: baseUrl + encodeURIComponent(mediaFileName(media.audio.path)), caption: effectiveCaption };
+          } else {
+            const audioSrc = await fileToBase64DataURL(media.audio.file);
+            cell = { type: 'photo+audio', src: imgSrc, audio: audioSrc, caption: effectiveCaption };
+          }
+          stats['photo+audio']++;
+
+        } else {
+          // PHOTO alone
+          if (isOnline) {
+            cell = { type: 'photo', url: imgUrl, caption: effectiveCaption };
+          } else {
+            cell = { type: 'photo', src: imgSrc, caption: effectiveCaption };
+          }
+          stats.photo++;
+        }
+
+      } else if (media.text) {
+        const txtContent = await fileToText(media.text.file);
+
+        if (media.audio) {
+          // TEXT + AUDIO
+          if (isOnline) {
+            cell = { type: 'text+audio', body: txtContent, audioUrl: baseUrl + encodeURIComponent(mediaFileName(media.audio.path)), caption: effectiveCaption };
+          } else {
+            const audioSrc = await fileToBase64DataURL(media.audio.file);
+            cell = { type: 'text+audio', body: txtContent, audio: audioSrc, caption: effectiveCaption };
+          }
+          stats['text+audio']++;
+        } else {
+          // TEXT alone
+          cell = { type: 'text', body: txtContent, caption: effectiveCaption };
+          stats.text++;
+        }
+
+      } else if (media.html) {
+        const htmlContent = await fileToText(media.html.file);
+        cell = { type: 'html', body: htmlContent, caption: effectiveCaption };
+        stats.html++;
+
+      } else if (media.audio) {
+        // AUDIO alone
+        if (isOnline) {
+          cell = { type: 'audio', audioUrl: baseUrl + encodeURIComponent(mediaFileName(media.audio.path)), caption: effectiveCaption };
+        } else {
+          const audioSrc = await fileToBase64DataURL(media.audio.file);
+          cell = { type: 'audio', audio: audioSrc, caption: effectiveCaption };
+        }
+        stats.audio++;
+
+      } else {
+        // Nothing found
+        cell = { type: 'empty', caption: effectiveCaption };
+        stats.empty++;
+        if (effectiveCaption) {
+          warnings.push(`No media found for "${colName}.${rowName}" — cell will show ellipsis. Caption exists: "${effectiveCaption.substring(0, 60)}…"`);
+        } else {
+          warnings.push(`No media found for "${colName}.${rowName}" — cell will show ellipsis. No caption defined either.`);
+        }
+      }
+
+      cells[ci].push(cell);
+      processed++;
+      bar.style.width = (processed / totalCells * 90) + '%';
+      await new Promise(r => setTimeout(r, 0));
+    }
+
+    // Warnings for missing subtitle / captions
+    if (!colLatin[ci]) {
+      warnings.push(`Column "${colName}" has no subtitle defined.`);
+    }
+    for (const rowName of planData.rows) {
+      const cap = colCaptions[norm(rowName)];
+      if (!cap && cap !== '') {
+        warnings.push(`No caption defined for "${colName}" → "${rowName}".`);
+      }
+    }
+  }
+
+  // Summary
+  report.push('── MEDIA SUMMARY ──');
+  report.push(`Photo cells: ${stats.photo}`);
+  report.push(`Photo+audio cells: ${stats['photo+audio']}`);
+  report.push(`Video cells: ${stats.video}`);
+  report.push(`Text cells: ${stats.text}`);
+  report.push(`Text+audio cells: ${stats['text+audio']}`);
+  report.push(`HTML cells: ${stats.html}`);
+  report.push(`Audio-only cells: ${stats.audio}`);
+  report.push(`Cells marked n/a: ${stats.na}`);
+  report.push(`Empty cells (no media found): ${stats.empty}`);
+  report.push('');
+
+  if (warnings.length > 0) {
+    report.push('── WARNINGS ──');
+    warnings.forEach((w, i) => report.push(`  ${i + 1}. ${w}`));
+    report.push('');
+  }
+
+  if (warnings.length === 0 && stats.empty === 0) {
+    report.push('✓ No issues found. Clean build!');
+    report.push('');
+  }
+
+  // List all media found in the folder
+  report.push('── MEDIA FILES IN FOLDER ──');
+  const uniqueMedia = new Set();
+  Object.values(mediaFiles).forEach(v => uniqueMedia.add(v.path));
+  const sortedMedia = Array.from(uniqueMedia).sort();
+  sortedMedia.forEach(p => report.push(`  ${p}`));
+  report.push('');
+
+  report.push('── EXPECTED FILE NAMES ──');
+  for (const col of planData.columns) {
+    for (const row of planData.rows) {
+      report.push(`  ${col}.${row}.[jpg/png/mp4/mp3/m4a/txt/html/etc]`);
+    }
+  }
+  report.push('');
+
+  // Build the HTML
+  buildStatus.textContent = 'Assembling atlas…';
+  bar.style.width = '95%';
+
+  const html = isOnline
+    ? buildOnlineAtlasHTML(colNames, colLatin, planData.rows, cells, planData.atlasName)
+    : buildAtlasHTML(colNames, colLatin, planData.rows, cells, planData.atlasName);
+
+  bar.style.width = '100%';
+
+  // Download atlas
+  const atlasBlob = new Blob([html], { type: 'text/html' });
+  const atlasUrl = URL.createObjectURL(atlasBlob);
+  const a = document.createElement('a');
+  a.href = atlasUrl;
+  a.download = planData.atlasName + '.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(atlasUrl);
+
+  // Show report
+  const reportStr = report.join('\n');
+  reportText.textContent = reportStr;
+  const reportBlob = new Blob([reportStr], { type: 'text/plain' });
+  reportDl.href = URL.createObjectURL(reportBlob);
+  reportSection.classList.add('active');
+
+  const totalMedia = stats.photo + stats['photo+audio'] + stats.video + stats.text + stats['text+audio'] + stats.html + stats.audio;
+  if (isOnline) {
+    buildStatus.textContent = `✓ Online atlas built! ${totalMedia} media cells referenced, ${stats.empty} empty, ${stats.na} n/a. Author must upload media files to: ${baseUrl}`;
+  } else {
+    buildStatus.textContent = `✓ Atlas built! ${totalMedia} media cells embedded, ${stats.empty} empty, ${stats.na} n/a.`;
+  }
+  if (warnings.length > 0) {
+    buildStatus.textContent += ` ${warnings.length} warning(s) — see report below.`;
+  }
+  buildBtn.disabled = false;
+  buildBtn.textContent = 'Build Again';
+});
+
+// ══════════════════════════════════════════════════════════
+// ATLAS HTML GENERATOR — generalized for all media types
+// ══════════════════════════════════════════════════════════
+function buildAtlasHTML(colNames, colLatin, rowNames, cells, title) {
+  let dataJS = 'var colNames=' + JSON.stringify(colNames) + ';\n';
+  dataJS += 'var colLatin=' + JSON.stringify(colLatin) + ';\n';
+  dataJS += 'var rowNames=' + JSON.stringify(rowNames) + ';\n';
+  dataJS += 'var nCols=' + colNames.length + ',nRows=' + rowNames.length + ';\n';
+
+  // cells[ci][ri] = { type, src?, audio?, body?, caption }
+  dataJS += 'var cells=[\n';
+  cells.forEach((col, ci) => {
+    dataJS += '  [\n';
+    col.forEach((cell, ri) => {
+      const obj = {};
+      obj.type = cell.type;
+      if (cell.src) obj.src = cell.src;
+      if (cell.url) obj.url = cell.url;
+      if (cell.audio) obj.audio = cell.audio;
+      if (cell.audioUrl) obj.audioUrl = cell.audioUrl;
+      if (cell.body !== undefined) obj.body = cell.body;
+      obj.caption = cell.caption || '';
+      dataJS += '    ' + JSON.stringify(obj);
+      if (ri < col.length - 1) dataJS += ',';
+      dataJS += '\n';
+    });
+    dataJS += '  ]';
+    if (ci < cells.length - 1) dataJS += ',';
+    dataJS += '\n';
+  });
+  dataJS += '];\n';
+
+  dataJS = dataJS.split('`').join('\\u0060').split('${').join('\\u0024{');
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>${esc(title)}\x3c/title>
+\x3cstyle>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:#0e0e12;color:#e8e4df;font-family:-apple-system,'Segoe UI',sans-serif;overflow:hidden;height:100vh;width:100vw;-webkit-tap-highlight-color:transparent}
+.h-track{display:flex;height:100vh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}
+.h-track::-webkit-scrollbar{display:none}
+.column{flex:0 0 100vw;width:100vw;height:100vh;scroll-snap-align:start;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;scrollbar-width:none}
+.column::-webkit-scrollbar{display:none}
+.column-label{position:sticky;top:0;z-index:10;padding:20px 24px 8px;background:linear-gradient(to bottom,#0e0e12 50%,transparent);text-align:center}
+.column-label .tree-name{font-size:1.0rem;color:#e8e4df;letter-spacing:.04em;font-weight:600}
+.column-label .subtitle{font-size:1.0rem;font-style:italic;color:#e8e4df;letter-spacing:.06em;margin-top:2px}
+.card{scroll-snap-align:start;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 28px 84px}
+.card .row-label{font-size:1.0rem;text-transform:uppercase;letter-spacing:.18em;color:#e8e4df;margin-bottom:10px}
+.card .img-wrap{width:100%;max-width:300px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);flex-shrink:0;position:relative}
+.card .img-wrap.na-cell{background:#a8c8e0;display:flex;align-items:center;justify-content:center}
+.card img{width:100%;height:100%;object-fit:cover;display:block;background:#1a1a22;transform-origin:center center;transition:transform .15s ease;user-select:none;-webkit-user-select:none}
+.card video{width:100%;height:100%;object-fit:cover;display:block;background:#1a1a22;border-radius:8px}
+.card .video-wrap{width:100%;max-width:300px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);flex-shrink:0;position:relative}
+.card .caption{font-size:1.0rem;line-height:1.5;margin-top:14px;color:#e8e4df;font-weight:300;text-align:center;max-width:300px}
+.card .text-body{width:100%;max-width:300px;aspect-ratio:9/16;overflow-y:auto;padding:24px;background:#14141c;border:1px solid #2a2a34;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:0.95rem;line-height:1.7;color:#e8e4df;font-weight:300;scrollbar-width:thin;scrollbar-color:#2a2a34 transparent}
+.card .text-body::-webkit-scrollbar{width:4px}
+.card .text-body::-webkit-scrollbar-thumb{background:#2a2a34;border-radius:2px}
+.card .html-body{width:100%;max-width:300px;max-height:60vh;overflow-y:auto;padding:24px;background:#14141c;border:1px solid #2a2a34;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:0.95rem;line-height:1.7;color:#e8e4df;scrollbar-width:thin;scrollbar-color:#2a2a34 transparent}
+.card .html-body::-webkit-scrollbar{width:4px}
+.card .html-body::-webkit-scrollbar-thumb{background:#2a2a34;border-radius:2px}
+.card .audio-ctrl{margin-top:12px;display:flex;align-items:center;gap:10px}
+.card .audio-btn{width:40px;height:40px;border-radius:50%;border:1px solid #3a4a32;background:rgba(122,154,106,0.15);color:#7a9a6a;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.card .audio-btn:hover{background:rgba(122,154,106,0.3)}
+.card .audio-progress{flex:1;height:3px;background:#1a1a24;border-radius:2px;overflow:hidden;cursor:pointer}
+.card .audio-progress-bar{height:100%;background:#7a9a6a;width:0%;transition:width .1s linear;border-radius:2px}
+.card .audio-time{font-size:0.7rem;color:#7a7570;min-width:32px;text-align:right}
+.arrow{position:fixed;top:50%;transform:translateY(-50%);z-index:100;width:34px;height:34px;border-radius:50%;border:1px solid #2a2824;background:rgba(14,14,18,.7);color:#8a857e;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .3s,color .3s;backdrop-filter:blur(6px)}
+.arrow:hover{border-color:#7a9a6a;color:#7a9a6a}
+.arrow.left{left:5px}.arrow.right{right:5px}
+.load-splash{position:fixed;top:0;left:0;width:100%;height:100%;z-index:200;background:#0e0e12;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s}
+.load-splash .title{font-size:1.1rem;color:#7a9a6a;letter-spacing:.08em;margin-bottom:16px}
+.load-splash .spinner{width:24px;height:24px;border:2px solid #2a2a34;border-top-color:#7a9a6a;border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+\x3c/style>
+\x3c/head>
+<body>
+<div class="load-splash" id="loadSplash">
+<div class="title">${esc(title)}</div>
+<div class="spinner"></div>
+<div style="margin-top:12px;font-size:0.75rem;color:#8a857e">Loading may take up to a minute</div>
+</div>
+<div class="h-track" id="hTrack"></div>
+<button class="arrow left" id="arrowLeft">‹</button>
+<button class="arrow right" id="arrowRight">›</button>
+\x3cscript>
+${dataJS}
+var track=document.getElementById('hTrack');
+var splash=document.getElementById('loadSplash');
+var curCol=0,curRow=0;
+var activeAudios=[];
+
+// ── Convert data URL to Blob URL for better browser compatibility ──
+function dataURLtoBlobURL(dataURL){
+  try{
+    var parts=dataURL.split(',');
+    var mime=parts[0].match(/:(.*?);/)[1];
+    var b64=parts[1];
+    var bin=atob(b64);
+    var len=bin.length;
+    var bytes=new Uint8Array(len);
+    for(var i=0;i<len;i++){bytes[i]=bin.charCodeAt(i);}
+    var blob=new Blob([bytes],{type:mime});
+    return URL.createObjectURL(blob);
+  }catch(e){return dataURL;}
+}
+
+// ── Format seconds as m:ss ──
+function fmtTime(s){if(isNaN(s))return'0:00';var m=Math.floor(s/60);var sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+
+// ── Stop all audio globally ──
+function stopAllAudio(){
+  activeAudios.forEach(function(a){try{a.pause();a.currentTime=0;}catch(e){}});
+}
+
+// ── Build audio controls ──
+function buildAudioCtrl(audioSrc,card){
+  var audio=new Audio(dataURLtoBlobURL(audioSrc));
+  activeAudios.push(audio);
+  var ctrl=document.createElement('div');ctrl.className='audio-ctrl';
+  var btn=document.createElement('button');btn.className='audio-btn';btn.innerHTML='&#9654;';
+  var prog=document.createElement('div');prog.className='audio-progress';
+  var progBar=document.createElement('div');progBar.className='audio-progress-bar';
+  prog.appendChild(progBar);
+  var timeEl=document.createElement('div');timeEl.className='audio-time';timeEl.textContent='0:00';
+  ctrl.appendChild(btn);ctrl.appendChild(prog);ctrl.appendChild(timeEl);
+
+  var playing=false;
+  btn.addEventListener('click',function(){
+    if(playing){audio.pause();btn.innerHTML='&#9654;';playing=false;}
+    else{audio.play();btn.innerHTML='&#9646;&#9646;';playing=true;}
+  });
+  audio.addEventListener('timeupdate',function(){
+    if(audio.duration){progBar.style.width=(audio.currentTime/audio.duration*100)+'%';}
+    timeEl.textContent=fmtTime(audio.currentTime);
+  });
+  audio.addEventListener('ended',function(){btn.innerHTML='&#9654;';playing=false;progBar.style.width='0%';audio.currentTime=0;});
+  prog.addEventListener('click',function(e){
+    if(audio.duration){var rect=prog.getBoundingClientRect();audio.currentTime=(e.clientX-rect.left)/rect.width*audio.duration;}
+  });
+
+  // Store audio ref on the card for visibility management
+  card._audio=audio;
+  card._audioBtn=btn;
+  card._audioPlaying=function(){return playing;};
+  card._audioPause=function(){if(playing){audio.pause();btn.innerHTML='&#9654;';playing=false;}};
+
+  return ctrl;
+}
+
+// ── Build one column's DOM ──
+function buildColumnDOM(ci){
+  var colEl=document.createElement('div');colEl.className='column';colEl.dataset.index=ci;
+  var label=document.createElement('div');label.className='column-label';
+  label.innerHTML='<div class="tree-name">'+colNames[ci]+'</div><div class="subtitle">'+(colLatin[ci]||'')+'</div>';
+  colEl.appendChild(label);
+
+  for(var ri=0;ri<nRows;ri++){
+    var cell=cells[ci][ri];
+    var card=document.createElement('div');card.className='card';
+    var rowLabel='<div class="row-label">'+rowNames[ri]+'</div>';
+
+    if(cell.type==='na'||cell.type==='empty'){
+      // N/A or empty — ellipsis placeholder
+      card.innerHTML=rowLabel+'<div class="img-wrap na-cell"><svg width="100" height="100" viewBox="0 0 100 100" fill="none"><circle cx="30" cy="50" r="5" fill="#1e4a6a"/><circle cx="50" cy="50" r="5" fill="#1e4a6a"/><circle cx="70" cy="50" r="5" fill="#1e4a6a"/></svg></div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='photo'){
+      card.innerHTML=rowLabel+'<div class="img-wrap"><img src="'+cell.src+'" alt="" loading="lazy"></div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='photo+audio'){
+      card.innerHTML=rowLabel+'<div class="img-wrap"><img src="'+cell.src+'" alt="" loading="lazy"></div><div class="caption">'+cell.caption+'</div>';
+      var ac=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac);
+
+    } else if(cell.type==='video'){
+      var vidBlobURL=dataURLtoBlobURL(cell.src);
+      card.innerHTML=rowLabel+'<div class="video-wrap"><video playsinline loop controls preload="metadata"></video></div><div class="caption">'+cell.caption+'</div>';
+      var vid=card.querySelector('video');
+      vid.src=vidBlobURL;
+      card._video=vid;
+
+    } else if(cell.type==='text'){
+      var safeBody=cell.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>');
+      card.innerHTML=rowLabel+'<div class="text-body">'+safeBody+'</div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='text+audio'){
+      var safeBody2=cell.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>');
+      card.innerHTML=rowLabel+'<div class="text-body">'+safeBody2+'</div><div class="caption">'+cell.caption+'</div>';
+      var ac2=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac2);
+
+    } else if(cell.type==='html'){
+      card.innerHTML=rowLabel+'<div class="html-body">'+cell.body+'</div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='audio'){
+      card.innerHTML=rowLabel+'<div class="img-wrap na-cell" style="background:#1a2a1a;aspect-ratio:1/1"><svg width="80" height="80" viewBox="0 0 80 80" fill="none"><path d="M30 20v40l25-20z" fill="#7a9a6a" opacity="0.6"/></svg></div><div class="caption">'+cell.caption+'</div>';
+      var ac3=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac3);
+    }
+
+    colEl.appendChild(card);
+  }
+
+  track.appendChild(colEl);
+  colEl.addEventListener('scroll',function(){
+    var ci2=parseInt(colEl.dataset.index);
+    if(ci2===curCol){curRow=Math.round(colEl.scrollTop/window.innerHeight);handleVisibility();}
+    resetAllZoom();
+  });
+}
+
+// ── Visibility management: pause audio / video when scrolling away ──
+function handleVisibility(){
+  var cols=document.querySelectorAll('.column');
+  for(var c=0;c<cols.length;c++){
+    var cards=cols[c].querySelectorAll('.card');
+    for(var r=0;r<cards.length;r++){
+      var card=cards[r];
+      var isVisible=(c===curCol && r===curRow);
+      // Pause audio when not visible
+      if(!isVisible && card._audioPause){card._audioPause();}
+      // Reset and replay video based on visibility
+      if(card._video){
+        if(isVisible){try{card._video.currentTime=0;card._video.play();}catch(e){}}
+        else{try{card._video.pause();card._video.currentTime=0;}catch(e){}}
+      }
+    }
+  }
+}
+
+function goToCol(ci){
+  if(ci<0||ci>=nCols)return;
+  track.scrollTo({left:ci*window.innerWidth,behavior:'smooth'});
+}
+
+function updateH(){
+  var idx=Math.round(track.scrollLeft/window.innerWidth);
+  if(idx!==curCol&&idx>=0&&idx<nCols){
+    resetAllZoom();
+    curCol=idx;
+    var cols=document.querySelectorAll('.column');
+    if(cols[curCol])cols[curCol].scrollTop=curRow*window.innerHeight;
+    handleVisibility();
+  }
+}
+
+track.addEventListener('scroll',updateH);
+
+document.getElementById('arrowLeft').addEventListener('click',function(){goToCol(curCol-1);});
+document.getElementById('arrowRight').addEventListener('click',function(){goToCol(curCol+1);});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')goToCol(curCol-1);if(e.key==='ArrowRight')goToCol(curCol+1);if(e.key==='Escape')resetAllZoom();});
+
+var activeImg=null,zoomScale=1,zoomX=0,zoomY=0,startDist=0,startScale=1,isPinching=false,panStartX=0,panStartY=0,wasPinching=false;
+function applyZoom(img){if(!img)return;img.style.transform='translate('+zoomX+'px,'+zoomY+'px) scale('+zoomScale+')';}
+function resetZoom(img){if(!img)return;img.style.transform='';if(activeImg===img){activeImg=null;zoomScale=1;zoomX=0;zoomY=0;}}
+function resetAllZoom(){document.querySelectorAll('.card img').forEach(function(img){img.style.transform='';});activeImg=null;zoomScale=1;zoomX=0;zoomY=0;}
+document.addEventListener('touchstart',function(e){var img=e.target.closest('.card img');if(!img)return;if(e.touches.length===2){isPinching=true;wasPinching=true;activeImg=img;startDist=getTD(e.touches);startScale=zoomScale;e.preventDefault();}else if(e.touches.length===1&&activeImg===img&&zoomScale>1.05){panStartX=e.touches[0].clientX-zoomX;panStartY=e.touches[0].clientY-zoomY;e.preventDefault();}},{passive:false});
+document.addEventListener('touchmove',function(e){var img=e.target.closest('.card img');if(!img)return;if(isPinching&&e.touches.length===2){var d=getTD(e.touches);zoomScale=Math.min(5,Math.max(.8,startScale*(d/startDist)));applyZoom(activeImg);e.preventDefault();}else if(e.touches.length===1&&activeImg===img&&zoomScale>1.05){zoomX=e.touches[0].clientX-panStartX;zoomY=e.touches[0].clientY-panStartY;applyZoom(activeImg);e.preventDefault();}},{passive:false});
+document.addEventListener('touchend',function(e){if(e.touches.length<2){isPinching=false;if(zoomScale<1){zoomScale=1;zoomX=0;zoomY=0;applyZoom(activeImg);}if(zoomScale<=1.05){resetZoom(activeImg);}setTimeout(function(){wasPinching=false;},100);}});
+function getTD(t){var dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
+document.addEventListener('wheel',function(e){var img=e.target.closest('.card img');if(!img)return;e.preventDefault();activeImg=img;var d=e.deltaY>0?.9:1.1;zoomScale=Math.min(5,Math.max(1,zoomScale*d));if(zoomScale<=1.05){resetZoom(img);}else{applyZoom(img);}},{passive:false});
+
+// ── Progressive rendering ──
+var loadIndex=0;
+function renderNext(){
+  if(loadIndex>=nCols){return;}
+  buildColumnDOM(loadIndex);
+  if(loadIndex===0){
+    splash.style.opacity='0';
+    setTimeout(function(){splash.style.display='none';handleVisibility();},500);
+  }
+  loadIndex++;
+  if(loadIndex<nCols){setTimeout(renderNext,0);}
+}
+renderNext();
+\x3c/script>
+\x3c/body>
+\x3c/html>`;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'\x26amp;').replace(/\x3c/g,'\x26lt;').replace(/\x3e/g,'\x26gt;').replace(/"/g,'\x26quot;');
+}
+
+// ══════════════════════════════════════════════════════════
+// ONLINE ATLAS HTML GENERATOR — fetches media on load
+// ══════════════════════════════════════════════════════════
+function buildOnlineAtlasHTML(colNames, colLatin, rowNames, cells, title) {
+  let dataJS = 'var colNames=' + JSON.stringify(colNames) + ';\n';
+  dataJS += 'var colLatin=' + JSON.stringify(colLatin) + ';\n';
+  dataJS += 'var rowNames=' + JSON.stringify(rowNames) + ';\n';
+  dataJS += 'var nCols=' + colNames.length + ',nRows=' + rowNames.length + ';\n';
+
+  dataJS += 'var cells=[\n';
+  cells.forEach((col, ci) => {
+    dataJS += '  [\n';
+    col.forEach((cell, ri) => {
+      const obj = {};
+      obj.type = cell.type;
+      if (cell.url) obj.url = cell.url;
+      if (cell.audioUrl) obj.audioUrl = cell.audioUrl;
+      if (cell.body !== undefined) obj.body = cell.body;
+      obj.caption = cell.caption || '';
+      dataJS += '    ' + JSON.stringify(obj);
+      if (ri < col.length - 1) dataJS += ',';
+      dataJS += '\n';
+    });
+    dataJS += '  ]';
+    if (ci < cells.length - 1) dataJS += ',';
+    dataJS += '\n';
+  });
+  dataJS += '];\n';
+
+  dataJS = dataJS.split('`').join('\\u0060').split('${').join('\\u0024{');
+
+  // The online atlas reuses the same CSS and renderer as the offline one,
+  // but replaces the progressive rendering with a fetch-all-then-render flow.
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>${esc(title)}\x3c/title>
+\x3cstyle>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:#0e0e12;color:#e8e4df;font-family:-apple-system,'Segoe UI',sans-serif;overflow:hidden;height:100vh;width:100vw;-webkit-tap-highlight-color:transparent}
+.h-track{display:flex;height:100vh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}
+.h-track::-webkit-scrollbar{display:none}
+.column{flex:0 0 100vw;width:100vw;height:100vh;scroll-snap-align:start;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;scrollbar-width:none}
+.column::-webkit-scrollbar{display:none}
+.column-label{position:sticky;top:0;z-index:10;padding:20px 24px 8px;background:linear-gradient(to bottom,#0e0e12 50%,transparent);text-align:center}
+.column-label .tree-name{font-size:1.0rem;color:#e8e4df;letter-spacing:.04em;font-weight:600}
+.column-label .subtitle{font-size:1.0rem;font-style:italic;color:#e8e4df;letter-spacing:.06em;margin-top:2px}
+.card{scroll-snap-align:start;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 28px 84px}
+.card .row-label{font-size:1.0rem;text-transform:uppercase;letter-spacing:.18em;color:#e8e4df;margin-bottom:10px}
+.card .img-wrap{width:100%;max-width:300px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);flex-shrink:0;position:relative}
+.card .img-wrap.na-cell{background:#a8c8e0;display:flex;align-items:center;justify-content:center}
+.card img{width:100%;height:100%;object-fit:cover;display:block;background:#1a1a22;transform-origin:center center;transition:transform .15s ease;user-select:none;-webkit-user-select:none}
+.card video{width:100%;height:100%;object-fit:cover;display:block;background:#1a1a22;border-radius:8px}
+.card .video-wrap{width:100%;max-width:300px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);flex-shrink:0;position:relative}
+.card .caption{font-size:1.0rem;line-height:1.5;margin-top:14px;color:#e8e4df;font-weight:300;text-align:center;max-width:300px}
+.card .text-body{width:100%;max-width:300px;aspect-ratio:9/16;overflow-y:auto;padding:24px;background:#14141c;border:1px solid #2a2a34;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:0.95rem;line-height:1.7;color:#e8e4df;font-weight:300;scrollbar-width:thin;scrollbar-color:#2a2a34 transparent}
+.card .text-body::-webkit-scrollbar{width:4px}
+.card .text-body::-webkit-scrollbar-thumb{background:#2a2a34;border-radius:2px}
+.card .html-body{width:100%;max-width:300px;max-height:60vh;overflow-y:auto;padding:24px;background:#14141c;border:1px solid #2a2a34;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:0.95rem;line-height:1.7;color:#e8e4df;scrollbar-width:thin;scrollbar-color:#2a2a34 transparent}
+.card .html-body::-webkit-scrollbar{width:4px}
+.card .html-body::-webkit-scrollbar-thumb{background:#2a2a34;border-radius:2px}
+.card .audio-ctrl{margin-top:12px;display:flex;align-items:center;gap:10px}
+.card .audio-btn{width:40px;height:40px;border-radius:50%;border:1px solid #3a4a32;background:rgba(122,154,106,0.15);color:#7a9a6a;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.card .audio-btn:hover{background:rgba(122,154,106,0.3)}
+.card .audio-progress{flex:1;height:3px;background:#1a1a24;border-radius:2px;overflow:hidden;cursor:pointer}
+.card .audio-progress-bar{height:100%;background:#7a9a6a;width:0%;transition:width .1s linear;border-radius:2px}
+.card .audio-time{font-size:0.7rem;color:#7a7570;min-width:32px;text-align:right}
+.arrow{position:fixed;top:50%;transform:translateY(-50%);z-index:100;width:34px;height:34px;border-radius:50%;border:1px solid #2a2824;background:rgba(14,14,18,.7);color:#8a857e;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .3s,color .3s;backdrop-filter:blur(6px)}
+.arrow:hover{border-color:#7a9a6a;color:#7a9a6a}
+.arrow.left{left:5px}.arrow.right{right:5px}
+.load-splash{position:fixed;top:0;left:0;width:100%;height:100%;z-index:200;background:#0e0e12;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s}
+.load-splash .title{font-size:1.1rem;color:#7a9a6a;letter-spacing:.08em;margin-bottom:16px}
+.load-splash .spinner{width:24px;height:24px;border:2px solid #2a2a34;border-top-color:#7a9a6a;border-radius:50%;animation:spin 0.8s linear infinite}
+.load-splash .progress{width:200px;height:6px;background:#1a1a24;border-radius:3px;overflow:hidden;margin-top:14px}
+.load-splash .progress-bar{height:100%;background:#7a9a6a;width:0%;transition:width 0.2s;border-radius:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+\x3c/style>
+\x3c/head>
+<body>
+<div class="load-splash" id="loadSplash">
+<div class="title">${esc(title)}</div>
+<div class="spinner"></div>
+<div id="loadMsg" style="margin-top:12px;font-size:0.75rem;color:#8a857e">Connecting…</div>
+<div class="progress"><div class="progress-bar" id="loadBar"></div></div>
+</div>
+<div class="h-track" id="hTrack"></div>
+<button class="arrow left" id="arrowLeft">‹</button>
+<button class="arrow right" id="arrowRight">›</button>
+\x3cscript>
+${dataJS}
+var track=document.getElementById('hTrack');
+var splash=document.getElementById('loadSplash');
+var loadMsg=document.getElementById('loadMsg');
+var loadBar=document.getElementById('loadBar');
+var curCol=0,curRow=0;
+var activeAudios=[];
+
+// ── Fetch a URL and return a blob URL ──
+function fetchToBlobURL(url){
+  return fetch(url).then(function(r){
+    if(!r.ok)throw new Error('Failed: '+url);
+    return r.blob();
+  }).then(function(b){
+    return URL.createObjectURL(b);
+  });
+}
+
+// ── Format seconds as m:ss ──
+function fmtTime(s){if(isNaN(s))return'0:00';var m=Math.floor(s/60);var sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+
+// ── Stop all audio globally ──
+function stopAllAudio(){
+  activeAudios.forEach(function(a){try{a.pause();a.currentTime=0;}catch(e){}});
+}
+
+// ── Build audio controls ──
+function buildAudioCtrl(audioSrc,card){
+  var audio=new Audio(audioSrc);
+  activeAudios.push(audio);
+  var ctrl=document.createElement('div');ctrl.className='audio-ctrl';
+  var btn=document.createElement('button');btn.className='audio-btn';btn.innerHTML='&#9654;';
+  var prog=document.createElement('div');prog.className='audio-progress';
+  var progBar=document.createElement('div');progBar.className='audio-progress-bar';
+  prog.appendChild(progBar);
+  var timeEl=document.createElement('div');timeEl.className='audio-time';timeEl.textContent='0:00';
+  ctrl.appendChild(btn);ctrl.appendChild(prog);ctrl.appendChild(timeEl);
+
+  var playing=false;
+  btn.addEventListener('click',function(){
+    if(playing){audio.pause();btn.innerHTML='&#9654;';playing=false;}
+    else{audio.play();btn.innerHTML='&#9646;&#9646;';playing=true;}
+  });
+  audio.addEventListener('timeupdate',function(){
+    if(audio.duration){progBar.style.width=(audio.currentTime/audio.duration*100)+'%';}
+    timeEl.textContent=fmtTime(audio.currentTime);
+  });
+  audio.addEventListener('ended',function(){btn.innerHTML='&#9654;';playing=false;progBar.style.width='0%';audio.currentTime=0;});
+  prog.addEventListener('click',function(e){
+    if(audio.duration){var rect=prog.getBoundingClientRect();audio.currentTime=(e.clientX-rect.left)/rect.width*audio.duration;}
+  });
+
+  card._audio=audio;
+  card._audioBtn=btn;
+  card._audioPlaying=function(){return playing;};
+  card._audioPause=function(){if(playing){audio.pause();btn.innerHTML='&#9654;';playing=false;}};
+
+  return ctrl;
+}
+
+// ── Build one column's DOM (uses blob URLs from cell.src/cell.audio) ──
+function buildColumnDOM(ci){
+  var colEl=document.createElement('div');colEl.className='column';colEl.dataset.index=ci;
+  var label=document.createElement('div');label.className='column-label';
+  label.innerHTML='<div class="tree-name">'+colNames[ci]+'</div><div class="subtitle">'+(colLatin[ci]||'')+'</div>';
+  colEl.appendChild(label);
+
+  for(var ri=0;ri<nRows;ri++){
+    var cell=cells[ci][ri];
+    var card=document.createElement('div');card.className='card';
+    var rowLabel='<div class="row-label">'+rowNames[ri]+'</div>';
+
+    if(cell.type==='na'||cell.type==='empty'){
+      card.innerHTML=rowLabel+'<div class="img-wrap na-cell"><svg width="100" height="100" viewBox="0 0 100 100" fill="none"><circle cx="30" cy="50" r="5" fill="#1e4a6a"/><circle cx="50" cy="50" r="5" fill="#1e4a6a"/><circle cx="70" cy="50" r="5" fill="#1e4a6a"/></svg></div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='photo'){
+      card.innerHTML=rowLabel+'<div class="img-wrap"><img src="'+cell.src+'" alt="" loading="lazy"></div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='photo+audio'){
+      card.innerHTML=rowLabel+'<div class="img-wrap"><img src="'+cell.src+'" alt="" loading="lazy"></div><div class="caption">'+cell.caption+'</div>';
+      var ac=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac);
+
+    } else if(cell.type==='video'){
+      card.innerHTML=rowLabel+'<div class="video-wrap"><video playsinline loop controls preload="metadata"></video></div><div class="caption">'+cell.caption+'</div>';
+      var vid=card.querySelector('video');
+      vid.src=cell.src;
+      card._video=vid;
+
+    } else if(cell.type==='text'){
+      var safeBody=cell.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>');
+      card.innerHTML=rowLabel+'<div class="text-body">'+safeBody+'</div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='text+audio'){
+      var safeBody2=cell.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>');
+      card.innerHTML=rowLabel+'<div class="text-body">'+safeBody2+'</div><div class="caption">'+cell.caption+'</div>';
+      var ac2=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac2);
+
+    } else if(cell.type==='html'){
+      card.innerHTML=rowLabel+'<div class="html-body">'+cell.body+'</div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='audio'){
+      card.innerHTML=rowLabel+'<div class="img-wrap na-cell" style="background:#1a2a1a;aspect-ratio:1/1"><svg width="80" height="80" viewBox="0 0 80 80" fill="none"><path d="M30 20v40l25-20z" fill="#7a9a6a" opacity="0.6"/></svg></div><div class="caption">'+cell.caption+'</div>';
+      var ac3=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac3);
+    }
+
+    colEl.appendChild(card);
+  }
+
+  track.appendChild(colEl);
+  colEl.addEventListener('scroll',function(){
+    var ci2=parseInt(colEl.dataset.index);
+    if(ci2===curCol){curRow=Math.round(colEl.scrollTop/window.innerHeight);handleVisibility();}
+    resetAllZoom();
+  });
+}
+
+// ── Visibility management ──
+function handleVisibility(){
+  var cols=document.querySelectorAll('.column');
+  for(var c=0;c<cols.length;c++){
+    var cards=cols[c].querySelectorAll('.card');
+    for(var r=0;r<cards.length;r++){
+      var card=cards[r];
+      var isVisible=(c===curCol && r===curRow);
+      if(!isVisible && card._audioPause){card._audioPause();}
+      if(card._video){
+        if(isVisible){try{card._video.currentTime=0;card._video.play();}catch(e){}}
+        else{try{card._video.pause();card._video.currentTime=0;}catch(e){}}
+      }
+    }
+  }
+}
+
+function goToCol(ci){
+  if(ci<0||ci>=nCols)return;
+  track.scrollTo({left:ci*window.innerWidth,behavior:'smooth'});
+}
+
+function updateH(){
+  var idx=Math.round(track.scrollLeft/window.innerWidth);
+  if(idx!==curCol&&idx>=0&&idx<nCols){
+    resetAllZoom();
+    curCol=idx;
+    var cols=document.querySelectorAll('.column');
+    if(cols[curCol])cols[curCol].scrollTop=curRow*window.innerHeight;
+    handleVisibility();
+  }
+}
+
+track.addEventListener('scroll',updateH);
+
+document.getElementById('arrowLeft').addEventListener('click',function(){goToCol(curCol-1);});
+document.getElementById('arrowRight').addEventListener('click',function(){goToCol(curCol+1);});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')goToCol(curCol-1);if(e.key==='ArrowRight')goToCol(curCol+1);if(e.key==='Escape')resetAllZoom();});
+
+var activeImg=null,zoomScale=1,zoomX=0,zoomY=0,startDist=0,startScale=1,isPinching=false,panStartX=0,panStartY=0,wasPinching=false;
+function applyZoom(img){if(!img)return;img.style.transform='translate('+zoomX+'px,'+zoomY+'px) scale('+zoomScale+')';}
+function resetZoom(img){if(!img)return;img.style.transform='';if(activeImg===img){activeImg=null;zoomScale=1;zoomX=0;zoomY=0;}}
+function resetAllZoom(){document.querySelectorAll('.card img').forEach(function(img){img.style.transform='';});activeImg=null;zoomScale=1;zoomX=0;zoomY=0;}
+document.addEventListener('touchstart',function(e){var img=e.target.closest('.card img');if(!img)return;if(e.touches.length===2){isPinching=true;wasPinching=true;activeImg=img;startDist=getTD(e.touches);startScale=zoomScale;e.preventDefault();}else if(e.touches.length===1&&activeImg===img&&zoomScale>1.05){panStartX=e.touches[0].clientX-zoomX;panStartY=e.touches[0].clientY-zoomY;e.preventDefault();}},{passive:false});
+document.addEventListener('touchmove',function(e){var img=e.target.closest('.card img');if(!img)return;if(isPinching&&e.touches.length===2){var d=getTD(e.touches);zoomScale=Math.min(5,Math.max(.8,startScale*(d/startDist)));applyZoom(activeImg);e.preventDefault();}else if(e.touches.length===1&&activeImg===img&&zoomScale>1.05){zoomX=e.touches[0].clientX-panStartX;zoomY=e.touches[0].clientY-panStartY;applyZoom(activeImg);e.preventDefault();}},{passive:false});
+document.addEventListener('touchend',function(e){if(e.touches.length<2){isPinching=false;if(zoomScale<1){zoomScale=1;zoomX=0;zoomY=0;applyZoom(activeImg);}if(zoomScale<=1.05){resetZoom(activeImg);}setTimeout(function(){wasPinching=false;},100);}});
+function getTD(t){var dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
+document.addEventListener('wheel',function(e){var img=e.target.closest('.card img');if(!img)return;e.preventDefault();activeImg=img;var d=e.deltaY>0?.9:1.1;zoomScale=Math.min(5,Math.max(1,zoomScale*d));if(zoomScale<=1.05){resetZoom(img);}else{applyZoom(img);}},{passive:false});
+
+// ── Fetch all media, then render ──
+(async function(){
+  // Collect all URLs to fetch
+  var fetchList=[];
+  for(var ci=0;ci<nCols;ci++){
+    for(var ri=0;ri<nRows;ri++){
+      var cell=cells[ci][ri];
+      if(cell.url)fetchList.push({ci:ci,ri:ri,field:'src',url:cell.url});
+      if(cell.audioUrl)fetchList.push({ci:ci,ri:ri,field:'audio',url:cell.audioUrl});
+    }
+  }
+
+  var total=fetchList.length;
+  var done=0;
+  var errors=[];
+
+  if(total===0){
+    loadMsg.textContent='No media to download';
+  } else {
+    loadMsg.textContent='Downloading: 0 of '+total+' files…';
+  }
+
+  // Fetch all, one at a time to show progress clearly
+  for(var i=0;i<fetchList.length;i++){
+    var item=fetchList[i];
+    try{
+      var blobURL=await fetchToBlobURL(item.url);
+      cells[item.ci][item.ri][item.field]=blobURL;
+    }catch(e){
+      errors.push(item.url);
+      cells[item.ci][item.ri][item.field]='';
+    }
+    done++;
+    loadBar.style.width=(done/total*100)+'%';
+    loadMsg.textContent='Downloading: '+done+' of '+total+' files…';
+  }
+
+  if(errors.length>0){
+    loadMsg.textContent='Downloaded '+done+' files ('+errors.length+' failed). Rendering…';
+  } else {
+    loadMsg.textContent='All '+total+' files downloaded. Rendering…';
+  }
+
+  // Now render all columns
+  for(var ci2=0;ci2<nCols;ci2++){
+    buildColumnDOM(ci2);
+  }
+
+  splash.style.opacity='0';
+  setTimeout(function(){splash.style.display='none';handleVisibility();},500);
+})();
+\x3c/script>
+\x3c/body>
+\x3c/html>`;
+}
+</script>
+</body>
+</html>
