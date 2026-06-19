@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Welcome</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#16271d;
+    --panel:#1d3328;
+    --paper:#ece3cd;
+    --sage:#9bb0a0;
+    --gold:#e3b23c;
+    --jacaranda:#9b8bc4;
+    --line:rgba(236,227,205,0.16);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--paper);
+    font-family:"Fraunces",Georgia,serif;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    -webkit-font-smoothing:antialiased;
+    padding:clamp(1.25rem,4vw,2.25rem);
+  }
+  .mono{font-family:"IBM Plex Mono",monospace}
+
+  /* ---------- masthead ---------- */
+  header{
+    max-width:980px;
+    width:100%;
+    margin:0 auto;
+    position:relative;
+  }
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.72rem;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    color:var(--sage);
+    display:flex;
+    align-items:center;
+    gap:.9rem;
+  }
+  .eyebrow::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--line);
+  }
+  .title-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:2rem;
+    margin-top:0;
+  }
+  h1{
+    font-weight:600;
+    font-size:clamp(3rem,11vw,6.4rem);
+    line-height:.92;
+    letter-spacing:-0.02em;
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:400;
+    color:var(--gold);
+    display:block;
+  }
+  .branch{
+    width:clamp(120px,18vw,210px);
+    height:auto;
+    flex-shrink:0;
+    overflow:visible;
+  }
+  .lede{
+    margin-top:1.8rem;
+    max-width:46ch;
+    font-size:clamp(1.05rem,2.2vw,1.3rem);
+    line-height:1.5;
+    color:var(--sage);
+  }
+  .lede strong{color:var(--paper);font-weight:600}
+
+  /* ---------- contents ---------- */
+  main{
+    max-width:980px;
+    width:100%;
+    margin:clamp(1.25rem,3vw,2rem) auto 0;
+  }
+  .contents-label{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.72rem;
+    letter-spacing:.32em;
+    text-transform:uppercase;
+    color:var(--sage);
+    margin-bottom:.4rem;
+  }
+  .entry{
+    display:grid;
+    grid-template-columns:1fr auto;
+    align-items:baseline;
+    gap:clamp(1rem,3vw,2.4rem);
+    padding:clamp(1.1rem,2.6vw,1.6rem) .6rem;
+    border-top:1px solid var(--line);
+    text-decoration:none;
+    color:inherit;
+    transition:background .35s ease,padding-left .35s ease;
+  }
+  .entry:last-of-type{border-bottom:1px solid var(--line)}
+  .entry .num{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.85rem;
+    color:var(--sage);
+    transition:color .35s ease;
+  }
+  .entry .label{
+    display:flex;
+    flex-direction:column;
+    gap:.35rem;
+  }
+  .entry .name{
+    font-size:clamp(1.6rem,4.4vw,2.5rem);
+    font-weight:600;
+    line-height:1;
+    letter-spacing:-0.01em;
+    transition:color .35s ease;
+  }
+  .entry .desc{
+    font-size:.98rem;
+    color:var(--sage);
+    line-height:1.45;
+    max-width:52ch;
+  }
+  .entry .arrow{
+    font-family:"IBM Plex Mono",monospace;
+    color:var(--sage);
+    font-size:1.3rem;
+    transition:transform .35s ease,color .35s ease;
+    align-self:center;
+  }
+  .entry:hover,.entry:focus-visible{
+    background:var(--panel);
+    padding-left:1.3rem;
+    outline:none;
+  }
+  .entry:hover .name,.entry:focus-visible .name{color:var(--gold)}
+  .entry:hover .num,.entry:focus-visible .num{color:var(--gold)}
+  .entry:hover .arrow,.entry:focus-visible .arrow{
+    transform:translateX(6px);
+    color:var(--gold);
+  }
+  .entry:focus-visible{box-shadow:inset 3px 0 0 var(--gold)}
+
+  /* the new section gets a quiet flag */
+  .entry .tag{
+    display:inline-block;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.6rem;
+    letter-spacing:.2em;
+    text-transform:uppercase;
+    color:var(--bg);
+    background:var(--jacaranda);
+    padding:.18em .55em;
+    border-radius:2px;
+    vertical-align:.28em;
+    margin-left:.7rem;
+  }
+
+   /* ---------- load animation ---------- */
+  @media (prefers-reduced-motion:no-preference){
+    .reveal{opacity:0;transform:translateY(14px);animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards}
+    .title-row{animation-delay:.05s}
+    .lede{animation-delay:.15s}
+    main .contents-label{animation-delay:.25s}
+    .entry:nth-of-type(1){animation-delay:.3s}
+    .entry:nth-of-type(2){animation-delay:.38s}
+    .entry:nth-of-type(3){animation-delay:.46s}
+    .entry:nth-of-type(4){animation-delay:.54s}
+    footer{animation-delay:.62s}
+    .leaf-draw{stroke-dasharray:1;stroke-dashoffset:1;animation:draw 1.6s ease forwards .3s}
+  }
+  @keyframes rise{to{opacity:1;transform:translateY(0)}}
+  @keyframes draw{to{stroke-dashoffset:0}}
+
+  @media (max-width:620px){
+    .title-row{gap:1rem;align-items:center}
+    .branch{width:clamp(84px,22vw,130px)}
+    .entry{grid-template-columns:1fr;gap:1rem}
+    .entry .arrow{display:none}
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="title-row reveal">
+      <h1>Ajijic<em>Tree Atlas</em></h1>
+      <svg class="branch" viewBox="0 0 200 240" fill="none" stroke="var(--gold)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path class="leaf-draw" pathLength="1" d="M150 232 C150 200 138 170 120 150 C100 128 78 112 70 80 C64 56 70 28 84 10"/>
+        <path class="leaf-draw" pathLength="1" d="M118 152 C96 150 70 158 56 178 C78 182 104 176 118 152Z"/>
+        <path class="leaf-draw" pathLength="1" d="M104 122 C84 116 60 118 44 132 C66 142 92 138 104 122Z"/>
+        <path class="leaf-draw" pathLength="1" d="M92 96 C112 88 134 86 152 96 C134 110 108 110 92 96Z"/>
+        <path class="leaf-draw" pathLength="1" d="M78 66 C58 62 36 66 22 82 C44 90 68 84 78 66Z"/>
+        <path class="leaf-draw" pathLength="1" d="M82 42 C100 32 124 30 142 40 C124 54 98 54 82 42Z"/>
+        <circle cx="84" cy="10" r="3" fill="var(--gold)" stroke="none"/>
+      </svg>
+    </div>
+  </header>
+
+  <main>
+    
+
+    <a class="entry reveal" href="Guide.html" target="_blank">
+      <span class="label">
+        <span class="name">Guide</span>
+        <span class="desc">Read this first; use tab button  
+		<svg viewBox="0 0 24 24" width="1.05em" height="1.05em" role="img"
+         aria-label="tab switcher button" fill="none" stroke="currentColor"
+         stroke-width="1.8" style="vertical-align:-0.18em;">
+      <rect x="4" y="4" width="16" height="16" rx="4"/>
+      <text x="12" y="12.5" font-size="9" font-weight="600" text-anchor="middle"
+            dominant-baseline="central" fill="currentColor" stroke="none"
+            font-family="system-ui, sans-serif">3</text>
+    </svg>
+	  to return here</span>
+      </span>
+      <span class="arrow">→</span>
+    </a>
+
+ <a class="entry reveal" href="Introduction.html" target="_blank">
+      <span class="label">
+        <span class="name">Introduction</span>
+        <span class="desc">Read this next; use tab button  
+		<svg viewBox="0 0 24 24" width="1.05em" height="1.05em" role="img"
+         aria-label="tab switcher button" fill="none" stroke="currentColor"
+         stroke-width="1.8" style="vertical-align:-0.18em;">
+      <rect x="4" y="4" width="16" height="16" rx="4"/>
+      <text x="12" y="12.5" font-size="9" font-weight="600" text-anchor="middle"
+            dominant-baseline="central" fill="currentColor" stroke="none"
+            font-family="system-ui, sans-serif">3</text>
+    </svg>
+	  to return here
+		</span>
+      </span>
+      <span class="arrow">→</span>
+    </a>   <a class="entry reveal" href="Atlas.html" target="_blank">
+      <span class="label">
+        <span class="name">Atlas</span>
+        <span class="desc">The atlas itself; use tab button 
+		<svg viewBox="0 0 24 24" width="1.05em" height="1.05em" role="img"
+         aria-label="tab switcher button" fill="none" stroke="currentColor"
+         stroke-width="1.8" style="vertical-align:-0.18em;">
+      <rect x="4" y="4" width="16" height="16" rx="4"/>
+      <text x="12" y="12.5" font-size="9" font-weight="600" text-anchor="middle"
+            dominant-baseline="central" fill="currentColor" stroke="none"
+            font-family="system-ui, sans-serif">3</text>
+    </svg>
+		for reviews</span>
+      </span>
+      <span class="arrow">→</span>
+    </a>
+
+    <a class="entry reveal" href="https://DavidKurtRose.github.io/DIY.html" target="_blank">
+      <span class="label">
+        <span class="name">DIY<span class="tag">New</span></span>
+        <span class="desc">If you have expertise in something, make an atlas for it.</span>
+      </span>
+      <span class="arrow">→</span>
+    </a>
+  </main>
+
+</body>
+</html>

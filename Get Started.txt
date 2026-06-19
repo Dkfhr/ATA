@@ -1,0 +1,94 @@
+ReadMe file
+
+This folder contains several files.
+If you are here just to enjoy the Atlas, then look at three files:
+(1) Atlas-Introduction.html, that introduces you to the subject of the Atlas. 
+(2) Atlas-Guide.html, that tells you how to navigate the altas.
+(3) Tree-Atlas.html, for example, which is why you are here.
+
+If you are knowledgeable about some area of science, culture, 
+art, anything, consider creating an Altas yourself.
+It's a fair amount of work, but it's rewarding.
+If you are interested, read on. 
+
+The idea behind an Atlas is this:
+You want to present a modest collection of:
+trees, wildflowers, birds, mushrooms, domestic flowers, sculptures, etc, 
+in a forest, on a mountain, in a park, arboretum, botanical garden...,
+textiles, native masks, artworks, minerals, or cars in a museum...
+distinctive houses, buildings, monuments in a neighborhood, town, or city ...
+
+An "atlas" doesn't have to be an atlas!
+It could be a comparison or contrast among several things,
+like different mathmatical proofs of several propositions.
+It could be a timeline comparing the development of
+metals technologies over time in various parts of the world.
+It could be a comparison of language grammers.
+It could trace the evolution of the eye.
+Anything...
+
+The kind of Atlas you create is a table in two dimensions:
+several columns for the different items of interest,
+and several rows for their shared aspects.
+
+Across the table, the viewer will move from one column to another,
+in the order you feel is most helpful for enjoying
+and understanding the subject of your atlas.
+Up and down, the viewer will move from one aspect to another,
+again in the most helpful order.
+
+As viewer navigates about in the atlas, we say she moves from cell to cell.
+Each cell can contain a photo, audio, video, text, html, 
+photo plus audio, or a text plus audio.
+
+The Atlas-Builder will happily create a big atlas of say, 100 items 
+by 15 aspects, but that will choke an average phone.
+So, if the phone is your target, keep your ambition more modest:
+a sample rather than a comprehensive volume.
+If your target is the PC, then your atlas can be bigger
+because the average PC is more powerful than a phone.
+
+How to build your atlas:
+Start out by building your work-space.
+Create a folder like Documents/Atlas, that will be where
+you keep your tools for building an atlas.
+Move Atlas-Builder.html, Template Plan.txt, and Get Started.txt there.
+Create folders there for building specific atlases, like 
+Documents/Atlas/Ajijic Tree Atlas and 
+Documents/Atlas/Ajijic Bird Atlas.
+
+Open Documents/Atlas/Plan template.txt in your 
+favorite text editor, and open a new tab next to it.
+Copy-and-paste to create your own plan in the new tab
+The Atlas-Builder will read the following inputs from it:
+a name for the atlas, names for the columns, 
+names for the rows, Captions and subtitles.
+Then do "Save As" > Documents/Atlas/MyAtlas/MyAtlas Plan.txt
+
+You have to collect all your media into Documents/Atlas/MyAtlas.
+The simplest thing is to name each media item after
+the cell in which it should be displayed,
+for example: oak.tree.jpg, elm.bark.mp4, maple.leaf.txt .
+The extension -- or in MacOS the type -- tells Atlas-Builder
+what type of media goes into the cell.
+
+Run Atlas-Builder.html in the browser of your choice.
+Tap the "Select folder" button and Atlas-Builder opens a file picker.
+Navigate to your MyAtlas folder.
+It's confusing because when you get to Documents/Atlas/MyAtlas
+the file picker complains "No items match your search". 
+Ignore the message and tap the Upload button at lower-right. 
+Then confirm that you trust the "site", which of course is your own folder.
+
+Give Atlas-Builder one of your Atlas Plan.txt files;
+you can have several -- MyAtlas1 Plan.txt, MyAtlas2 Plan.txt, etc. --
+so that you can test and compare various ideas and configurations.
+ 
+When you tap the "Build Atlas" button, 
+Atlas-Builder builds and downloads your Atlas.
+Run it in a browser on your PC or phone, or both.
+Refine and rebuild until you like what you've created. 
+Then publish.
+
+
+ 

@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Ajijic Tree Atlas</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:#0e0e12;color:#e8e4df;font-family:-apple-system,'Segoe UI',sans-serif;overflow:hidden;height:100vh;width:100vw;-webkit-tap-highlight-color:transparent}
+.h-track{display:flex;height:100vh;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none}
+.h-track::-webkit-scrollbar{display:none}
+.column{flex:0 0 100vw;width:100vw;height:100vh;scroll-snap-align:start;overflow-y:auto;overflow-x:hidden;scroll-snap-type:y mandatory;scrollbar-width:none}
+.column::-webkit-scrollbar{display:none}
+.column-label{position:sticky;top:0;z-index:10;padding:20px 24px 8px;background:linear-gradient(to bottom,#0e0e12 50%,transparent);text-align:center}
+.column-label .tree-name{font-size:1.0rem;color:#e8e4df;letter-spacing:.04em;font-weight:600}
+.column-label .subtitle{font-size:1.0rem;font-style:italic;color:#e8e4df;letter-spacing:.06em;margin-top:2px}
+.card{scroll-snap-align:start;width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 28px 84px}
+.card .row-label{font-size:1.0rem;text-transform:uppercase;letter-spacing:.18em;color:#e8e4df;margin-bottom:10px}
+.card .img-wrap{width:100%;max-width:300px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);flex-shrink:0;position:relative}
+.card .img-wrap.na-cell{background:#a8c8e0;display:flex;align-items:center;justify-content:center}
+.card img{width:100%;height:100%;object-fit:cover;display:block;background:#1a1a22;transform-origin:center center;transition:transform .15s ease;user-select:none;-webkit-user-select:none}
+.card video{width:100%;height:100%;object-fit:cover;display:block;background:#1a1a22;border-radius:8px}
+.card .video-wrap{width:100%;max-width:300px;aspect-ratio:9/16;border-radius:8px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,.6);flex-shrink:0;position:relative}
+.card .caption{font-size:1.0rem;line-height:1.5;margin-top:14px;color:#e8e4df;font-weight:300;text-align:center;max-width:300px}
+.card .text-body{width:100%;max-width:300px;aspect-ratio:9/16;overflow-y:auto;padding:24px;background:#14141c;border:1px solid #2a2a34;border-radius:8px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:0.95rem;line-height:1.7;color:#e8e4df;font-weight:300;scrollbar-width:thin;scrollbar-color:#2a2a34 transparent}
+.card .text-body::-webkit-scrollbar{width:4px}
+.card .text-body::-webkit-scrollbar-thumb{background:#2a2a34;border-radius:2px}
+.card .html-body{width:100%;max-width:300px;max-height:60vh;overflow-y:auto;padding:24px;background:#14141c;border:1px solid #2a2a34;border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,.6);font-size:0.95rem;line-height:1.7;color:#e8e4df;scrollbar-width:thin;scrollbar-color:#2a2a34 transparent}
+.card .html-body::-webkit-scrollbar{width:4px}
+.card .html-body::-webkit-scrollbar-thumb{background:#2a2a34;border-radius:2px}
+.card .audio-ctrl{margin-top:12px;display:flex;align-items:center;gap:10px}
+.card .audio-btn{width:40px;height:40px;border-radius:50%;border:1px solid #3a4a32;background:rgba(122,154,106,0.15);color:#7a9a6a;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.card .audio-btn:hover{background:rgba(122,154,106,0.3)}
+.card .audio-progress{flex:1;height:3px;background:#1a1a24;border-radius:2px;overflow:hidden;cursor:pointer}
+.card .audio-progress-bar{height:100%;background:#7a9a6a;width:0%;transition:width .1s linear;border-radius:2px}
+.card .audio-time{font-size:0.7rem;color:#7a7570;min-width:32px;text-align:right}
+.arrow{position:fixed;top:50%;transform:translateY(-50%);z-index:100;width:34px;height:34px;border-radius:50%;border:1px solid #2a2824;background:rgba(14,14,18,.7);color:#8a857e;font-size:1rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:border-color .3s,color .3s;backdrop-filter:blur(6px)}
+.arrow:hover{border-color:#7a9a6a;color:#7a9a6a}
+.arrow.left{left:5px}.arrow.right{right:5px}
+.load-splash{position:fixed;top:0;left:0;width:100%;height:100%;z-index:200;background:#0e0e12;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity 0.5s}
+.load-splash .title{font-size:1.1rem;color:#7a9a6a;letter-spacing:.08em;margin-bottom:16px}
+.load-splash .spinner{width:24px;height:24px;border:2px solid #2a2a34;border-top-color:#7a9a6a;border-radius:50%;animation:spin 0.8s linear infinite}
+.load-splash .progress{width:200px;height:6px;background:#1a1a24;border-radius:3px;overflow:hidden;margin-top:14px}
+.load-splash .progress-bar{height:100%;background:#7a9a6a;width:0%;transition:width 0.2s;border-radius:3px}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="load-splash" id="loadSplash">
+<div class="title">Ajijic Tree Atlas</div>
+<div class="spinner"></div>
+<div id="loadMsg" style="margin-top:12px;font-size:0.75rem;color:#8a857e">Connecting…</div>
+<div class="progress"><div class="progress-bar" id="loadBar"></div></div>
+</div>
+<div class="h-track" id="hTrack"></div>
+<button class="arrow left" id="arrowLeft">‹</button>
+<button class="arrow right" id="arrowRight">›</button>
+<script>
+var colNames=["Cardon","Ceiba","Chilicote","Cojoton","Encino Magnolia","Encino Roble","Guaje","Guanacaste","Huizache","Maguey","Myrtle","Nolina","Nopal","Papel","Pistacia Mexicana","Quebracho","Rock Fig","Strangler Fig","Tepeguaje"];
+var colLatin=["Pachycereus pecten-aboriginum","Ceiba aesculifolia","Erythrina flabelliformis","Tabernaemontana donnell-smithii","Quercus magnoliifolia","Quercus rugosa","Leucaena leucocephala","Enterolobium cyclocarpum","Vachellia pennatula","Agave inaequidens","Eugenia capuli","Nolina longifolia","Opuntia ficus-indica","Bursera simaruba","pistacho silvestre","Lysiloma divaricatum","Ficus petiolaris","Ficus cotinifolia","Lysiloma acapulcense"];
+var rowNames=["tree","leaf","bark","display","germ","note1","note2"];
+var nCols=19,nRows=7;
+var cells=[
+  [
+    {"type":"photo+audio","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Cardon.tree.jpg","audioUrl":"https://davidkurtrose.github.io/AjijicTreeAtlas/Cardon.tree.m4a","caption":"Cardón is a large candelabra form cactus with many upright columns arising from the base."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Cardon.leaf.jpg","caption":"Bluish-green stems with a waxy look. Numerous ribs (typically ~10–12)."},
+    {"type":"empty","caption":""},
+    {"type":"text","body":"The forested mountains above Lake Chapala, the Sierra de San Juan Cosalá, \r\nare part of the Bajío Dry Forests ecoregion of west central Mexico. \r\nDue to agricultural, residential, and industrial development in the Bajío, \r\nonly about 5% of the original habitat remains. \r\nSo the Sierra de San Juan Cosalá is a very significant remnant of \r\noriginal forest that remains largely undeveloped, \r\nand is at least partially protected.","caption":""},
+    {"type":"na","caption":"n/a"},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Ceiba.tree.jpg","caption":"Ceiba, aka pochote or kapok, is a large tree that can reach up to 30 meters (100 feet) tall, with a thick trunk covered in large, conical thorns. Leaves are palmately compound, and bears fruit filled with silky fiber."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Ceiba.leaf.jpg","caption":"Palmately compound leathery leaves with about seven leaflets."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Ceiba.bark.jpg","caption":"Gray to brown with whitish or yellow fungal patches, covered in conical thorns especially in young trees."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Ceiba.display.jpg","caption":"Large flowers, white to pale pink, with five petals, blooming in spring and collapsing by day."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Ceiba.germ.jpg","caption":"A large, football-shaped capsule that splits open to reveal seeds embedded in a soft, white, silky fiber (kapok)."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Chilicote.tree.jpg","caption":"Chilicote, aka Western Coralbean, is a small tree up to 5 m high, found mostly at higher elevations, although there a few lower down. There is a small grove above the Campanaria."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Chilicote.leaf.jpg","caption":"trifoliate - groups of three leaflets, stiff and leathery, generally broader than long."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Chilicote.bark.jpg","caption":"fairly smooth, mottled pink, with greenish patches. The bark coloration is a very distinctive feature."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Chilicote.display.jpg","caption":"bright scarlet, about 4 cm long, very distinctive."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Chilicote.germ.jpg","caption":"Pods and Seeds: brown, tapered toward both ends, 15cm long. Splitting open when ripe to show oval scarlet-red seeds up to 1.5 cm across, seeds are poisonous."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Cojoton.tree.jpg","caption":"Cojoton is commonly known as the horse balls tree, referencing the egg shaped pods it produces. In Spanish, it is called huevos de caballo, cojones de burro, cojón de mico, or cojotón. It grows to 20m."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Cojoton.leaf.jpg","caption":"broad ovate leaves with an extended pointed tip, and pinnate parallel veins to the leaf margins."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Cojoton.bark.jpg","caption":"smooth brown bark"},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Cojoton.germ.jpg","caption":"egg-shaped shaped green pods about 5 cm diameter, splitting open to reveal a red fruity interior, and exudes a sticky white latex."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Encino%20Magnolia.tree.jpg","caption":"Quercus magnoliifolia is an oak species characterized by its very large leaves 20 to 30 cm (12 in) long. A tall tree to 20 m. Found in the oak forests at higher elevations, and most common in the Hidden Valley area."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Encino%20Magnolia.leaf.jpg","caption":"Largest leaves of any local oak species, up to 30 cm (12 in) long. Thick, green and leathery, widely egg-shaped, wavy edges, shallowly lobed, green on the top but covered with yellowish hairs under. Venation shows a strong midrib with evenly spaced secondary veins."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Encino%20Magnolia.bark.jpg","caption":"Rough, deeply fissured bark"},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Encino%20Magnolia.germ.jpg","caption":"large acorns with shallow cups, usually solitary or paired."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Encino_Roble.tree.jpg","caption":"Encino Roble is a common oak at the high elevations on the skyridge. A medium sized tree, to 15 meters tall, with a broad crown, with stout, spreading limbs."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Encino_Roble.leaf.jpg","caption":"Rugosa leaves are thick, leathery, with a strongly rugose (wrinkled/bullate) surface; irregular shallow lobing rather than sharp teeth;"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Encino_Roble.bark.jpg","caption":"Dark gray-brown, rough and blocky on mature trees"},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Encino_Roble.germ.jpg","caption":"brown, fairly long with pointed tips"},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guaje.tree.jpg","caption":"Guaje -- akakwhite leadtree -- is a medium sized, fast-growing tree, 3–20 m. Widely dispersed and abundant at the lower elevations on the hillsides. Common names include guaje, white leadtree, river tamarind"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guaje.leaf.jpg","caption":"Bipinnate, feathery appearance"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guaje.bark.jpg","caption":"greyish white, radial circular rings, cork like texture."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guaje.display.jpg","caption":"white, round"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guaje.germ.jpg","caption":"Seed pods: long narrow pods 15- 20 cm, green becoming brown to redish hue, usually abundant. The pods have edible seeds, and some locals harvest them when they start to mature in December and January."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guanacaste.tree.jpg","caption":"Guanacaste -- aka Elephant-ear Tree -- is a medium to large tree, growing to 25–30 m tall. The crown is broad and widely spreading, often with a spherical crown. Common at lower elevations. It has distinctive, curiously shaped seedpods."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guanacaste.leaf.jpg","caption":"bipinnate compound, 15–40 cm long and 17 cm broad. Foliage is slightly yellowish green. Starts to shed leaves in December, at the start of the dry season."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guanacaste.bark.jpg","caption":"light gray to brown, with prominent dark reddish-brown vertical fissures."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guanacaste.display.jpg","caption":"Small, white flowers grouped in round heads."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Guanacaste.germ.jpg","caption":"Large, woody, ear-shaped pods that are dark brown containing large, flat seeds. A distinctive feature unlike the seed pods on other similar trees."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Huizache.tree.jpg","caption":"Huizache -- aka Fern-Leaf Acacia -- is a thorny, small tree or shrub, with a spreading crown, growing 3-10 meters tall."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Huizache.leaf.jpg","caption":"bipinnate, fern-like, finely divided leaves."},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Huizache.display.jpg","caption":"Small, yellow, spherical clusters (puffballs) appearing in the dry season."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Huizache.germ.jpg","caption":"Legume pods, rich in protein, valuable for wildlife and livestock."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Maguey.tree.jpg","caption":"Maguey is a very large form of agave found in the oak forest zone at 1800–2500 m on the skyridge. It has a large, open rosette with long, lanceolate green leaves. Prominent marginal teeth and a strong terminal spine."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Maguey.leaf.jpg","caption":"Maguey is a very large form of agave found in the oak forest zone at 1800–2500 m on the skyridge. It has a large, open rosette with long, lanceolate green leaves. Prominent marginal teeth and a strong terminal spine."},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Maguey.display.jpg","caption":"When they flower at the end of their life cycle, they sprout a tall, robust paniculate inflorescence with many rounded, umbel-like flower clusters. The yellow flowers have long stamens and a thick green to reddish peduncle.The flowering structure is widely spaced and tree-like."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Maguey.germ.jpg","caption":"turning yellow to red"},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Myrtle.tree.jpg","caption":"Aka Capulín silvestre or Arrayán __ medium sized tree, with glossy green leaves that remain on the tree into the dry season. There are several along the Copal Chino trail."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Myrtle.leaf.jpg","caption":"alternate, thick, glossy, smooth margins, strongly arcuate veins (veins that curve toward the leaf tip)"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Myrtle.bark.jpg","caption":"rough, fissured, gray-brown on mature trunks"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Myrtle.display.jpg","caption":"small, white, with many long stamens"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Myrtle.germ.jpg","caption":"oval seeds on short stalks on older wood."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Nolina.tree.jpg","caption":"Nolina -- aka Bear grass -- is an unusual tree-like plant 3 - 5m tall,  found in the oak forest zone on or near the skyridge at 2000+m. It has a clear trunk, dark fissured bark, with a dense “skirt” of long, narrow, flexible green leaves mixed with brown dead leaves, that form a large terminal rosette."},
+    {"type":"na","caption":"n/a"},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Nolina.display.jpg","caption":"When they are in bloom they have tall, light brown, narrow inflorescences rising well above the crown. It's not a tree, but an asparagus!"},
+    {"type":"na","caption":"n/a"},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Nopal.tree.jpg","caption":"Nopal -- aka prickly pear -- is the most common wild tree-forming nopal cactus, to 7 m tall, found at elevations 1600–2400 m. It has an arborescent, tree-like form with a single woody trunk and spreading crown."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Nopal.leaf.jpg","caption":"Medium-sized, oval to obovate cladodes, the spiny paddle-like, thick and succulent leaves of the plant. With the spines removed it is commonly used in mexican cuisine."},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Nopal.display.jpg","caption":"Nopal with abundant red flowers in March."},
+    {"type":"na","caption":"n/a"},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Papel.tree.jpg","caption":"Papel is a large spreading tree with multi-stemmed, twisting trunks, 10-30 m. The copper-red peeling bark is characteristic. Widely dispersed at lower elevations, with many in the upper Tempisque canyon on the East slope. Common names include  Palo mulato, Chacá, Cuajiote, Papel"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Papel.leaf.jpg","caption":"leaves are spirally arranged and pinnately compound with 7-11 leaflets. Leafless or semi-leafless in the dry season"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Papel.bark.jpg","caption":"strongly exfoliating coppery-reddish brown peeling bark. Freshly exposed bark is smooth, green to olive. Often locally called Papel due to the peeling bark."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Papel.display.jpg","caption":"Small, creamy-white to pale green"},
+    {"type":"na","caption":"n/a"},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Pistacia%20Mexicana.tree.jpg","caption":"Mexican pistache is characterized by their glossy green pinnate leaves. A medium to large tree (5-15m.) Widely dispersed on the hillsides, with many on the lower slopes of the Tempisque Horse trail. Unfortunately they do not produce edible pistachos."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Pistacia%20Mexicana.leaf.jpg","caption":"compound pinnate leaf, with 7–15 opposite leaflets, elliptic–oblong. Slightly leathery, glossy green. Rachis reddish to tan. Often growing fan-like from the branch tips. The leaves stay on the trees well into the dry season, providing welcome shade in hot weather. The crushed leaves have a resinous smell."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Pistacia%20Mexicana.bark.jpg","caption":"Dark gray to brown"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Pistacia%20Mexicana.display.jpg","caption":"Cream white flowers become small red to black drupes (pea-sized) on female trees."},
+    {"type":"na","caption":"n/a"},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Quebracho.tree.jpg","caption":"Typically a small to medium-sized tree, densely branched, with an open spreading crown up to 15m. A much smaller tree than the related species Tepeguaje. Widely dispersed locally at lower elevations. There are many on the crosstrail west of the Capilla junction."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Quebracho.leaf.jpg","caption":"Bipinnate, many small leaflets (usually 10–30+ per pinna)"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Quebracho.bark.jpg","caption":"Gray to brown, slightly fissured with age. Younger bark is smoother. The related Tepeguaje has much coarser fissured dark brown bark."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Quebracho.display.jpg","caption":"Creamy-white, puffball-like clusters"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Quebracho.germ.jpg","caption":"Flat, thin, and often twisted or spiraled as they dry, 5–9 cm long. Brown at maturity. Often in large quantities, with dense clusters. They look like Tepeguaje pods but much smaller."},
+    {"type":"na","caption":"n/a"},
+    {"type":"empty","caption":""}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Rock_Fig.tree.jpg","caption":"The Rock Fig, locally Amate or Tescalame, has a distinctive cream colored trunk. A large tree to 30m, with distinctive heart shaped leaves. The Nahuatl word, Tescalame, ‘tescal’ is rock and ‘amate' is paper made from the bark."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Rock_Fig.leaf.jpg","caption":"large, leathery, heart-shaped (cordate) leaves, dark green with pinkish-white veins and tufts of white hairs on the underside."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Rock_Fig.bark.jpg","caption":"smooth and cream colored, wiith roots often spreading over rock surfaces"},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Rock_Fig.germ.jpg","caption":"Produces small, greenish figs, turning reddish with age. Like many figs, it produces a sap (ficusin) that can cause skin irritation or swelling if ingested."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Rock_Fig.note1.jpg","caption":"The Rock Fig often grows on rocky cliffs, with roots spreading over rock faces to find moisture."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Rock_Fig.note2.jpg","caption":"large muscular branches, forming a spreading crown on older trees."}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Strangler_Fig.tree.jpg","caption":"Locally Nacapul or Alamo, a tree with glossy leathery leaves, a robust trunk, large tree to 30 m. It starts as an epiphyte, sending roots down to envelop and constrict its host tree."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Strangler_Fig.leaf.jpg","caption":"elliptic to obovate, thick and leathery, smooth margins, rounded to slightly pointed tips, with a strong yellowish midrib with fine lateral veins."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Strangler_Fig.bark.jpg","caption":"smooth , gray-brown bark"},
+    {"type":"na","caption":"n/a"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Strangler_Fig.germ.jpg","caption":"small green figs along the stems turning reddish when ripe."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Strangler_Fig.note1.jpg","caption":"Often with exposed roots covering rocks or other trees - hence its common name, strangler fig."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Strangler_Fig.note2.jpg","caption":"It starts as an epiphyte, sending roots down to envelop and constrict its host tree. In this photo a Tepeguaje is getting enveloped by a strangler fig, which will eventually overcome the Tepeguaje."}
+  ],
+  [
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Tepeguaje.tree.jpg","caption":"Tepeguajes are the most common large apex canopy trees on the hillsides above Ajijic, with dark fissured bark and feathery bipinnate leaves. Typically grows 5-20 meters tall, sometimes reaching 30 meters. Some specimens are very large with huge spreading crowns. Trees retain their leaves well into the dry season."},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Tepeguaje.leaf.jpg","caption":"Fine, feathery, bipinnate (similar to acacia)"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Tepeguaje.bark.jpg","caption":"Bark"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Tepeguaje.display.jpg","caption":"Small, whitish, in fluffy clusters"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Tepeguaje.germ.jpg","caption":"Flat seed pods typical of legumes"},
+    {"type":"photo","url":"https://davidkurtrose.github.io/AjijicTreeAtlas/Tepeguaje.note1.jpg","caption":"big muscular limbs, forming a large spreading crown in older trees."},
+    {"type":"empty","caption":""}
+  ]
+];
+
+var track=document.getElementById('hTrack');
+var splash=document.getElementById('loadSplash');
+var loadMsg=document.getElementById('loadMsg');
+var loadBar=document.getElementById('loadBar');
+var curCol=0,curRow=0;
+var activeAudios=[];
+
+// ── Fetch a URL and return a blob URL ──
+function fetchToBlobURL(url){
+  return fetch(url).then(function(r){
+    if(!r.ok)throw new Error('Failed: '+url);
+    return r.blob();
+  }).then(function(b){
+    return URL.createObjectURL(b);
+  });
+}
+
+// ── Format seconds as m:ss ──
+function fmtTime(s){if(isNaN(s))return'0:00';var m=Math.floor(s/60);var sec=Math.floor(s%60);return m+':'+(sec<10?'0':'')+sec;}
+
+// ── Stop all audio globally ──
+function stopAllAudio(){
+  activeAudios.forEach(function(a){try{a.pause();a.currentTime=0;}catch(e){}});
+}
+
+// ── Build audio controls ──
+function buildAudioCtrl(audioSrc,card){
+  var audio=new Audio(audioSrc);
+  activeAudios.push(audio);
+  var ctrl=document.createElement('div');ctrl.className='audio-ctrl';
+  var btn=document.createElement('button');btn.className='audio-btn';btn.innerHTML='&#9654;';
+  var prog=document.createElement('div');prog.className='audio-progress';
+  var progBar=document.createElement('div');progBar.className='audio-progress-bar';
+  prog.appendChild(progBar);
+  var timeEl=document.createElement('div');timeEl.className='audio-time';timeEl.textContent='0:00';
+  ctrl.appendChild(btn);ctrl.appendChild(prog);ctrl.appendChild(timeEl);
+
+  var playing=false;
+  btn.addEventListener('click',function(){
+    if(playing){audio.pause();btn.innerHTML='&#9654;';playing=false;}
+    else{audio.play();btn.innerHTML='&#9646;&#9646;';playing=true;}
+  });
+  audio.addEventListener('timeupdate',function(){
+    if(audio.duration){progBar.style.width=(audio.currentTime/audio.duration*100)+'%';}
+    timeEl.textContent=fmtTime(audio.currentTime);
+  });
+  audio.addEventListener('ended',function(){btn.innerHTML='&#9654;';playing=false;progBar.style.width='0%';audio.currentTime=0;});
+  prog.addEventListener('click',function(e){
+    if(audio.duration){var rect=prog.getBoundingClientRect();audio.currentTime=(e.clientX-rect.left)/rect.width*audio.duration;}
+  });
+
+  card._audio=audio;
+  card._audioBtn=btn;
+  card._audioPlaying=function(){return playing;};
+  card._audioPause=function(){if(playing){audio.pause();btn.innerHTML='&#9654;';playing=false;}};
+
+  return ctrl;
+}
+
+// ── Build one column's DOM (uses blob URLs from cell.src/cell.audio) ──
+function buildColumnDOM(ci){
+  var colEl=document.createElement('div');colEl.className='column';colEl.dataset.index=ci;
+  var label=document.createElement('div');label.className='column-label';
+  label.innerHTML='<div class="tree-name">'+colNames[ci]+'</div><div class="subtitle">'+(colLatin[ci]||'')+'</div>';
+  colEl.appendChild(label);
+
+  for(var ri=0;ri<nRows;ri++){
+    var cell=cells[ci][ri];
+    var card=document.createElement('div');card.className='card';
+    var rowLabel='<div class="row-label">'+rowNames[ri]+'</div>';
+
+    if(cell.type==='na'||cell.type==='empty'){
+      card.innerHTML=rowLabel+'<div class="img-wrap na-cell"><svg width="100" height="100" viewBox="0 0 100 100" fill="none"><circle cx="30" cy="50" r="5" fill="#1e4a6a"/><circle cx="50" cy="50" r="5" fill="#1e4a6a"/><circle cx="70" cy="50" r="5" fill="#1e4a6a"/></svg></div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='photo'){
+      card.innerHTML=rowLabel+'<div class="img-wrap"><img src="'+cell.src+'" alt="" loading="lazy"></div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='photo+audio'){
+      card.innerHTML=rowLabel+'<div class="img-wrap"><img src="'+cell.src+'" alt="" loading="lazy"></div><div class="caption">'+cell.caption+'</div>';
+      var ac=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac);
+
+    } else if(cell.type==='video'){
+      card.innerHTML=rowLabel+'<div class="video-wrap"><video playsinline loop controls preload="metadata"></video></div><div class="caption">'+cell.caption+'</div>';
+      var vid=card.querySelector('video');
+      vid.src=cell.src;
+      card._video=vid;
+
+    } else if(cell.type==='text'){
+      var safeBody=cell.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      card.innerHTML=rowLabel+'<div class="text-body">'+safeBody+'</div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='text+audio'){
+      var safeBody2=cell.body.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+      card.innerHTML=rowLabel+'<div class="text-body">'+safeBody2+'</div><div class="caption">'+cell.caption+'</div>';
+      var ac2=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac2);
+
+    } else if(cell.type==='html'){
+      card.innerHTML=rowLabel+'<div class="html-body">'+cell.body+'</div><div class="caption">'+cell.caption+'</div>';
+
+    } else if(cell.type==='audio'){
+      card.innerHTML=rowLabel+'<div class="img-wrap na-cell" style="background:#1a2a1a;aspect-ratio:1/1"><svg width="80" height="80" viewBox="0 0 80 80" fill="none"><path d="M30 20v40l25-20z" fill="#7a9a6a" opacity="0.6"/></svg></div><div class="caption">'+cell.caption+'</div>';
+      var ac3=buildAudioCtrl(cell.audio,card);
+      card.appendChild(ac3);
+    }
+
+    colEl.appendChild(card);
+  }
+
+  track.appendChild(colEl);
+  colEl.addEventListener('scroll',function(){
+    var ci2=parseInt(colEl.dataset.index);
+    if(ci2===curCol){curRow=Math.round(colEl.scrollTop/window.innerHeight);handleVisibility();}
+    resetAllZoom();
+  });
+}
+
+// ── Visibility management ──
+function handleVisibility(){
+  var cols=document.querySelectorAll('.column');
+  for(var c=0;c<cols.length;c++){
+    var cards=cols[c].querySelectorAll('.card');
+    for(var r=0;r<cards.length;r++){
+      var card=cards[r];
+      var isVisible=(c===curCol && r===curRow);
+      if(!isVisible && card._audioPause){card._audioPause();}
+      if(card._video){
+        if(isVisible){try{card._video.currentTime=0;card._video.play();}catch(e){}}
+        else{try{card._video.pause();card._video.currentTime=0;}catch(e){}}
+      }
+    }
+  }
+}
+
+function goToCol(ci){
+  if(ci<0||ci>=nCols)return;
+  track.scrollTo({left:ci*window.innerWidth,behavior:'smooth'});
+}
+
+function updateH(){
+  var idx=Math.round(track.scrollLeft/window.innerWidth);
+  if(idx!==curCol&&idx>=0&&idx<nCols){
+    resetAllZoom();
+    curCol=idx;
+    var cols=document.querySelectorAll('.column');
+    if(cols[curCol])cols[curCol].scrollTop=curRow*window.innerHeight;
+    handleVisibility();
+  }
+}
+
+track.addEventListener('scroll',updateH);
+
+document.getElementById('arrowLeft').addEventListener('click',function(){goToCol(curCol-1);});
+document.getElementById('arrowRight').addEventListener('click',function(){goToCol(curCol+1);});
+document.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')goToCol(curCol-1);if(e.key==='ArrowRight')goToCol(curCol+1);if(e.key==='Escape')resetAllZoom();});
+
+var activeImg=null,zoomScale=1,zoomX=0,zoomY=0,startDist=0,startScale=1,isPinching=false,panStartX=0,panStartY=0,wasPinching=false;
+function applyZoom(img){if(!img)return;img.style.transform='translate('+zoomX+'px,'+zoomY+'px) scale('+zoomScale+')';}
+function resetZoom(img){if(!img)return;img.style.transform='';if(activeImg===img){activeImg=null;zoomScale=1;zoomX=0;zoomY=0;}}
+function resetAllZoom(){document.querySelectorAll('.card img').forEach(function(img){img.style.transform='';});activeImg=null;zoomScale=1;zoomX=0;zoomY=0;}
+document.addEventListener('touchstart',function(e){var img=e.target.closest('.card img');if(!img)return;if(e.touches.length===2){isPinching=true;wasPinching=true;activeImg=img;startDist=getTD(e.touches);startScale=zoomScale;e.preventDefault();}else if(e.touches.length===1&&activeImg===img&&zoomScale>1.05){panStartX=e.touches[0].clientX-zoomX;panStartY=e.touches[0].clientY-zoomY;e.preventDefault();}},{passive:false});
+document.addEventListener('touchmove',function(e){var img=e.target.closest('.card img');if(!img)return;if(isPinching&&e.touches.length===2){var d=getTD(e.touches);zoomScale=Math.min(5,Math.max(.8,startScale*(d/startDist)));applyZoom(activeImg);e.preventDefault();}else if(e.touches.length===1&&activeImg===img&&zoomScale>1.05){zoomX=e.touches[0].clientX-panStartX;zoomY=e.touches[0].clientY-panStartY;applyZoom(activeImg);e.preventDefault();}},{passive:false});
+document.addEventListener('touchend',function(e){if(e.touches.length<2){isPinching=false;if(zoomScale<1){zoomScale=1;zoomX=0;zoomY=0;applyZoom(activeImg);}if(zoomScale<=1.05){resetZoom(activeImg);}setTimeout(function(){wasPinching=false;},100);}});
+function getTD(t){var dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;return Math.sqrt(dx*dx+dy*dy);}
+document.addEventListener('wheel',function(e){var img=e.target.closest('.card img');if(!img)return;e.preventDefault();activeImg=img;var d=e.deltaY>0?.9:1.1;zoomScale=Math.min(5,Math.max(1,zoomScale*d));if(zoomScale<=1.05){resetZoom(img);}else{applyZoom(img);}},{passive:false});
+
+// ── Fetch all media, then render ──
+(async function(){
+  // Collect all URLs to fetch
+  var fetchList=[];
+  for(var ci=0;ci<nCols;ci++){
+    for(var ri=0;ri<nRows;ri++){
+      var cell=cells[ci][ri];
+      if(cell.url)fetchList.push({ci:ci,ri:ri,field:'src',url:cell.url});
+      if(cell.audioUrl)fetchList.push({ci:ci,ri:ri,field:'audio',url:cell.audioUrl});
+    }
+  }
+
+  var total=fetchList.length;
+  var done=0;
+  var errors=[];
+
+  if(total===0){
+    loadMsg.textContent='No media to download';
+  } else {
+    loadMsg.textContent='Downloading: 0 of '+total+' files…';
+  }
+
+  // Fetch all, one at a time to show progress clearly
+  for(var i=0;i<fetchList.length;i++){
+    var item=fetchList[i];
+    try{
+      var blobURL=await fetchToBlobURL(item.url);
+      cells[item.ci][item.ri][item.field]=blobURL;
+    }catch(e){
+      errors.push(item.url);
+      cells[item.ci][item.ri][item.field]='';
+    }
+    done++;
+    loadBar.style.width=(done/total*100)+'%';
+    loadMsg.textContent='Downloading: '+done+' of '+total+' files…';
+  }
+
+  if(errors.length>0){
+    loadMsg.textContent='Downloaded '+done+' files ('+errors.length+' failed). Rendering…';
+  } else {
+    loadMsg.textContent='All '+total+' files downloaded. Rendering…';
+  }
+
+  // Now render all columns
+  for(var ci2=0;ci2<nCols;ci2++){
+    buildColumnDOM(ci2);
+  }
+
+  splash.style.opacity='0';
+  setTimeout(function(){splash.style.display='none';handleVisibility();},500);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+// The following line  tells Atlas Builder the name 
+// to assign to the atlas it  outputs.
+
+Atlas Name: Ajijic Tree Atlas // for example
+
+// The following list declares the column names, 
+// Atlas-Builder counts the number of names to determine the number of columns,
+// and the order of the names determines the order of the columns
+
+Column: 
+oak, maple, elm, ...
+
+// The following list declares the row names, 
+// Atlas-Builder counts the number of names to determine the number of rows,
+// and the order of the names determines the order of the rows.
+
+Row: 
+tree, leaf, bark, display, germ, note1, note2 // for example 
+
+// All you have to do to add a column or row, or change the order, is:
+// add a new name, or change the order of the names.
+// Henceforth, Atlas-Builder will  build your atlas that way.
+
+// The following lists tell the Atlas-Builder the 
+// captions that decorate each cell of your atlas.
+// There's a list for each column, named for that column.
+// The first list item is an optional subtitle 
+// The rest of the list items are named after their row,
+// and each contains the text of the caption for 
+// that cell's media, if you want it to have one. 
+
+// These lists do not have to be in any particular order.
+// Note: nothing in these lists tells Atlas-Builder what media
+// occupies each cell of your atlas; that comes later.
+
+Caption:
+
+oak:
+subtitle: Pachycereus pecten-aboriginum
+tree: Oak is a large candelabra form tree with many upright columns.
+leaf: Bluish-green stems with a waxy look. Numerous ribs (typically ~10–12).
+Closely spaced areoles bearing several dark, stiff spines.
+germ: Acorns are the oak's seeds.
+
+maple:
+subtitle: Ceiba aesculifolia
+tree: Maple, aka pochote or kapok, is a large tree that can reach up to 30 meters
+leaf: Palmately compound leathery leaves with about seven leaflets.
+bark: Gray to brown with whitish or yellow fungal patches, covered in conical thorns especially in young trees.
+display: Large flowers, white to pale pink, with five petals, blooming in spring and collapsing by day.
+germ: A large, football-shaped capsule that splits open to reveal seeds embedded in a soft, white, silky fiber (kapok).
+
+//etc., for every column
+
+// End of Column-row lists
+
+// Note: It is the presence or absence of a media file,
+// not the above caption data,
+// that determines what is shown in each cell of your atlas.
+// If there is no media file for it, a cell will present a big ellipsis.
+// An empty cell can have a caption, perhaps to explain why it's empty.
+
+// Folder "MyAtlas" must contain either:
+// (1) All the media files needed for the atlas, 
+//      named according to this convention:
+//     col.row.extension, for example:	
+//     maple.tree.jpg, oak.leaf.jpg, elm.bark.jpg, etc.
+// 	and, or
+// (2) Folders that contain media files needed for the atlas. 
+//      (a) Each folder is named after a column, for example:  oak
+//      (b) Each folder contains media files for that respective column, 
+//           named after their row, for example: tree.jpg, bark.mp4, leaf.html
+ 
+// Atlas-Builder recognizes the following media types:
+// Photo: jpg, jpeg, png, gif, webp, bmp, svg
+// Video: mp4, webm, mov
+// Audio: mp3, m4a, ogg, wav
+// Text: txt
+// HTML: html, htm
+

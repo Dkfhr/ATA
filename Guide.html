@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Source+Sans+Pro:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0e0e12;
+    color: #e8e4df;
+    font-family: 'Source Sans Pro', sans-serif;
+    font-size: 1.0rem;
+    line-height: 1.7;
+    overflow-y: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 50px 28px 80px;
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: #e8e4df;
+    letter-spacing: 0.03em;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 1.0rem;
+    color: #e8e4df;
+    margin-bottom: 48px;
+  }
+
+  h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.2rem;
+    color: #e8e4df;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #1e1e26;
+  }
+
+  p {
+    margin-bottom: 16px;
+    color: #c8c4be;
+  }
+
+  /* ── Gesture cards ── */
+  .gesture {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 24px;
+    padding: 18px 20px;
+    background: #14141c;
+    border-radius: 10px;
+    border: 1px solid #1e1e26;
+  }
+
+  .gesture-icon {
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border-radius: 10px;
+    background: #1a1a24;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .gesture-text {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .gesture-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.05rem;
+    color: #e8e4df;
+    margin-bottom: 4px;
+  }
+
+  .gesture-desc {
+    font-size: 0.92rem;
+    color: #e8e4df;
+    line-height: 1.5;
+  }
+
+  /* ── Row label list ── */
+  .row-list {
+    margin: 16px 0 16px 0;
+  }
+
+  .row-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 10px 0;
+    border-bottom: 1px solid #1a1a22;
+  }
+
+  .row-number {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #1a1a24;
+    border: 1px solid #2a2a34;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    color: #7a7570;
+    flex-shrink: 0;
+  }
+
+  .row-name {
+    font-size: 1.0rem;
+    color: #e8e4df;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .row-explain {
+    font-size: 0.88rem;
+    color: #e8e4df;
+    margin-left: auto;
+  }
+
+  /* ── Ellipsis sample ── */
+  .na-sample {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 44px;
+    background: #a8c8e0;
+    border-radius: 6px;
+    vertical-align: middle;
+    margin: 0 4px;
+  }
+
+  /* ── Divider ── */
+  .section-gap {
+    height: 1px;
+    background: #1e1e26;
+    margin: 44px 0;
+  }
+
+  /* ── Subtle animation on load ── */
+  .page > * {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: fadeUp 0.5s ease forwards;
+  }
+  .page > *:nth-child(1)  { animation-delay: 0.05s; }
+  .page > *:nth-child(2)  { animation-delay: 0.1s; }
+  .page > *:nth-child(3)  { animation-delay: 0.15s; }
+  .page > *:nth-child(4)  { animation-delay: 0.2s; }
+  .page > *:nth-child(5)  { animation-delay: 0.25s; }
+  .page > *:nth-child(6)  { animation-delay: 0.3s; }
+  .page > *:nth-child(7)  { animation-delay: 0.35s; }
+  .page > *:nth-child(8)  { animation-delay: 0.4s; }
+  .page > *:nth-child(9)  { animation-delay: 0.45s; }
+  .page > *:nth-child(10) { animation-delay: 0.5s; }
+  .page > *:nth-child(11) { animation-delay: 0.55s; }
+  .page > *:nth-child(12) { animation-delay: 0.6s; }
+  .page > *:nth-child(13) { animation-delay: 0.65s; }
+  .page > *:nth-child(14) { animation-delay: 0.7s; }
+  .page > *:nth-child(15) { animation-delay: 0.75s; }
+  .page > *:nth-child(16) { animation-delay: 0.8s; }
+  .page > *:nth-child(17) { animation-delay: 0.85s; }
+  .page > *:nth-child(18) { animation-delay: 0.9s; }
+  .page > *:nth-child(19) { animation-delay: 0.95s; }
+  .page > *:nth-child(20) { animation-delay: 1.0s; }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <h2>Navigate between Intro, Guide, and Atlas</h2>
+  <p>
+    On your phone, look near-right in the browser toolbar,
+	for the tab button
+    <svg viewBox="0 0 24 24" width="1.05em" height="1.05em" role="img"
+         aria-label="tab switcher button" fill="none" stroke="currentColor"
+         stroke-width="1.8" style="vertical-align:-0.18em;">
+      <rect x="4" y="4" width="16" height="16" rx="4"/>
+    </svg>
+     — the little rounded square 
+	that shows how many tabs you have open.
+	Use it to navigate between pages.
+	That way, they remain available for review.
+  </p>
+
+  <h2>Navigate the atlas</h2>
+
+  <p>The atlas is arranged as a table. 
+  Each column is a different tree. 
+  Each row shows a different characteristic of that tree. 
+  One photo fills the screen at a time.</p>
+
+  <div class="gesture">
+    <div class="gesture-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <line x1="6" y1="16" x2="26" y2="16" stroke="#e8e4df" stroke-width="1.5" stroke-linecap="round"/>
+        <polyline points="8,12 4,16 8,20" stroke="#e8e4df" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="24,12 28,16 24,20" stroke="#e8e4df" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="gesture-text">
+      <div class="gesture-name">Swipe left / right</div>
+      <div class="gesture-desc">Move between trees. 
+	  Each swipe goes to the next column. 
+	  On desktop,  use the arrow buttons or left/right arrow keys.</div>
+    </div>
+  </div>
+
+  <div class="gesture">
+    <div class="gesture-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <line x1="16" y1="6" x2="16" y2="26" stroke="#e8e4df" stroke-width="1.5" stroke-linecap="round"/>
+        <polyline points="12,8 16,4 20,8" stroke="#e8e4df" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+        <polyline points="12,24 16,28 20,24" stroke="#e8e4df" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="gesture-text">
+      <div class="gesture-name">Scroll up / down</div>
+      <div class="gesture-desc">Move between characteristics.
+	  Each scroll goes to the next row.
+	  On desktop, use the mouse scroll-wheel outside the photo.
+	  </div>
+    </div>
+  </div>
+
+  
+  <!-- ════════ ZOOM ════════ -->
+  <h2>Viewing Photos Up Close</h2>
+
+  <p>Any photo can be enlarged for a closer look.</p>
+
+   <div class="gesture">
+    <div class="gesture-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <circle cx="11" cy="18" r="4" stroke="#e8e4df" stroke-width="1.2" fill="none"/>
+        <circle cx="21" cy="14" r="4" stroke="#e8e4df" stroke-width="1.2" fill="none"/>
+        <line x1="14" y1="15" x2="18" y2="12" stroke="#e8e4df" stroke-width="1" stroke-dasharray="2 2"/>
+        <polyline points="7,21 5,23" stroke="#e8e4df" stroke-width="1.2" stroke-linecap="round"/>
+        <polyline points="25,11 27,9" stroke="#e8e4df" stroke-width="1.2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="gesture-text">
+      <div class="gesture-name">Pinch</div>
+      <div class="gesture-desc">Two finger pinch zooms in or out. 
+	  On desktop, use the scroll-wheel inside the photo.</div>
+    </div>
+  </div>
+
+  <div class="gesture">
+    <div class="gesture-icon">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <circle cx="12" cy="16" r="4" stroke="#e8e4df" stroke-width="1.2" fill="none"/>
+        <line x1="16" y1="16" x2="26" y2="12" stroke="#e8e4df" stroke-width="1.2" stroke-linecap="round"/>
+        <polyline points="23,10 26,12 23,14" stroke="#e8e4df" stroke-width="1.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <div class="gesture-text">
+      <div class="gesture-name">Drag</div>
+      <div class="gesture-desc">When zoomed in, drag with one finger 
+	  to pan around the photo and explore details. Just outside the photo,
+	  you can still swipe or scroll.</div>
+    </div>
+  </div>
+
+  <!-- ════════ ROWS ════════ -->
+  <h2>What the Rows Mean</h2>
+
+  <p>Each column follows the same structure from top to bottom, 
+  so you can compare the same characteristic across different 
+  subjects by swiping left or right.</p>
+
+  <div class="row-list">
+    <div class="row-item">
+      <div class="row-number">1</div>
+      <div class="row-name">Tree</div>
+      <div class="row-explain">Overall form</div>
+    </div>
+    <div class="row-item">
+      <div class="row-number">2</div>
+      <div class="row-name">Leaf</div>
+      <div class="row-explain">Foliage close-up</div>
+    </div>
+    <div class="row-item">
+      <div class="row-number">3</div>
+      <div class="row-name">Bark</div>
+      <div class="row-explain">Trunk and texture</div>
+    </div>
+    <div class="row-item">
+      <div class="row-number">4</div>
+      <div class="row-name">Display</div>
+      <div class="row-explain">Flower, cone, or catkin</div>
+    </div>
+    <div class="row-item">
+      <div class="row-number">5</div>
+      <div class="row-name">Germ</div>
+      <div class="row-explain">Fruit, nut, or seed</div>
+    </div>
+    <div class="row-item">
+      <div class="row-number">6</div>
+      <div class="row-name">Note</div>
+      <div class="row-explain">Something interesting or distinctive</div>
+    </div>
+  </div>
+
+  <!-- ════════ EMPTY CELLS ════════ -->
+  <h2>Empty Cells</h2>
+
+  <p>When a characteristic doesn't apply to a particular tree, 
+  the photo is replaced by a sky-blue card with three dots:
+    <span class="na-sample">
+      <svg width="50" height="20" viewBox="0 0 50 20" fill="none">
+        <circle cx="15" cy="10" r="3" fill="#1e4a6a"/>
+        <circle cx="25" cy="10" r="3" fill="#1e4a6a"/>
+        <circle cx="35" cy="10" r="3" fill="#1e4a6a"/>
+      </svg>
+    </span>
+  </p>
+
+  <p>The caption below may explain why. 
+  The cell is kept in place so that rows stay aligned 
+  across all columns — swiping sideways always lands 
+  on the same characteristic.</p>
+  
+  <p>
+  Now, use the tab-button to return where you came from.
+  </p>
+
+</body>
+</html>

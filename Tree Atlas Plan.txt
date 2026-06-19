@@ -1,0 +1,249 @@
+// First thing: // starts a comment, that tells the atlas author
+// how this file works for her, to declare and define her atlas.
+
+// This file should be in a folder named, for example, "AjijicTreeAtlas".
+// It should be named for example MyAtlas Plan.txt .
+// The only requirements are that the name must end with "Plan",
+// and it must be a text file.
+// The purpose of this file is to provide all the information
+// the Atlas Builder needs to build your altas.
+// When you finish writing it, you run Atlas Builder with this file as input,
+
+// The following line  tells Atlas Builder the name to assign to its output,
+// which is a self-contained html file end-user taps to run.
+
+Atlas Name: Ajijic Tree Atlas // for example
+
+// The following list declares the column names, 
+// Atlas Builder counts the number of names to determine the number of columns,
+// and the order of the names determines the order of the columns
+
+Column: 
+Cardon, Ceiba, Chilicote, Cojoton, Encino Magnolia, Encino Roble, Guaje, 
+Guanacaste, Huizache, Maguey, Myrtle, Nolina, Nopal, Papel, 
+Pistacia Mexicana, Quebracho, Rock Fig, Strangler Fig, Tepeguaje
+
+// The following list declares the row names, 
+// Atlas Builder counts the number of names to determine the number of rows,
+// and the order of the names determines the order of the rows.
+
+Row: 
+tree, leaf, bark, display, germ, note1, note2 // for example 
+
+// All you have to do to add a column or row, or change the order, is:
+// add a new name, or change the order of the names.
+// Atlas-Builder will henceforth build your atlas to correspond.
+
+// The following lists tell the Atlas Builder the 
+// captions that decorate each cell of your atlas.
+// There's a list for each column, named for that column.
+// The first list item is an optional subtitle 
+// The rest of the list items are named after their row,
+// and each contains the text of the caption for 
+// that cell's media, if you want it to have one. 
+
+// These lists do not have to be in any particular order.
+// Note: nothing in these lists tells Builder what media
+// occupies each cell of your atlas; that comes later.
+
+Caption:
+
+Cardon:
+subtitle: Pachycereus pecten-aboriginum
+tree: Cardón is a large candelabra form cactus with many upright columns arising from the base. 
+leaf: Bluish-green stems with a waxy look. Numerous ribs (typically ~10–12).
+Closely spaced areoles bearing several dark, stiff spines.
+germ: n/a
+note1: n/a
+
+Ceiba:
+subtitle: Ceiba aesculifolia
+tree: Ceiba, aka pochote or kapok, is a large tree that can reach up to 30 meters (100 feet) tall, with a thick trunk covered in large, conical thorns. Leaves are palmately compound, and bears fruit filled with silky fiber.
+leaf: Palmately compound leathery leaves with about seven leaflets.
+bark: Gray to brown with whitish or yellow fungal patches, covered in conical thorns especially in young trees.
+display: Large flowers, white to pale pink, with five petals, blooming in spring and collapsing by day.
+germ: A large, football-shaped capsule that splits open to reveal seeds embedded in a soft, white, silky fiber (kapok).
+note1: n/a
+
+Chilicote:
+subtitle: Erythrina flabelliformis
+tree: Chilicote, aka Western Coralbean, is a small tree up to 5 m high, found mostly at higher elevations, although there a few lower down. There is a small grove above the Campanaria.
+leaf: trifoliate - groups of three leaflets, stiff and leathery, generally broader than long.
+bark: fairly smooth, mottled pink, with greenish patches. The bark coloration is a very distinctive feature.
+display: bright scarlet, about 4 cm long, very distinctive.
+germ: Pods and Seeds: brown, tapered toward both ends, 15cm long. Splitting open when ripe to show oval scarlet-red seeds up to 1.5 cm across, seeds are poisonous.
+note1: n/a
+
+Cojoton:
+subtitle: Tabernaemontana donnell-smithii
+tree: Cojoton is commonly known as the horse balls tree, referencing the egg shaped pods it produces. In Spanish, it is called huevos de caballo, cojones de burro, cojón de mico, or cojotón. It grows to 20m.
+leaf: broad ovate leaves with an extended pointed tip, and pinnate parallel veins to the leaf margins.
+bark: smooth brown bark
+display: n/a
+germ: egg-shaped shaped green pods about 5 cm diameter, splitting open to reveal a red fruity interior, and exudes a sticky white latex.
+note1: n/a
+
+Guaje:
+subtitle: Leucaena leucocephala
+tree: Guaje -- akakwhite leadtree -- is a medium sized, fast-growing tree, 3–20 m. Widely dispersed and abundant at the lower elevations on the hillsides. Common names include guaje, white leadtree, river tamarind
+leaf: Bipinnate, feathery appearance
+bark: greyish white, radial circular rings, cork like texture.
+display: white, round
+germ: Seed pods: long narrow pods 15- 20 cm, green becoming brown to redish hue, usually abundant. The pods have edible seeds, and some locals harvest them when they start to mature in December and January.
+note1: n/a
+
+Guanacaste:
+subtitle: Enterolobium cyclocarpum
+tree: Guanacaste -- aka Elephant-ear Tree -- is a medium to large tree, growing to 25–30 m tall. The crown is broad and widely spreading, often with a spherical crown. Common at lower elevations. It has distinctive, curiously shaped seedpods.
+leaf: bipinnate compound, 15–40 cm long and 17 cm broad. Foliage is slightly yellowish green. Starts to shed leaves in December, at the start of the dry season.
+bark: light gray to brown, with prominent dark reddish-brown vertical fissures.
+display: Small, white flowers grouped in round heads.
+germ: Large, woody, ear-shaped pods that are dark brown containing large, flat seeds. A distinctive feature unlike the seed pods on other similar trees.
+note1: n/a
+
+Huizache:
+subtitle: Vachellia pennatula
+tree:  Huizache -- aka Fern-Leaf Acacia -- is a thorny, small tree or shrub, with a spreading crown, growing 3-10 meters tall.
+leaf: bipinnate, fern-like, finely divided leaves.
+bark: n/a
+display: Small, yellow, spherical clusters (puffballs) appearing in the dry season.
+germ: Legume pods, rich in protein, valuable for wildlife and livestock.
+note1: n/a
+
+Maguey:
+subtitle: Agave inaequidens
+tree: Maguey is a very large form of agave found in the oak forest zone at 1800–2500 m on the skyridge. It has a large, open rosette with long, lanceolate green leaves. Prominent marginal teeth and a strong terminal spine.
+leaf: Maguey is a very large form of agave found in the oak forest zone at 1800–2500 m on the skyridge. It has a large, open rosette with long, lanceolate green leaves. Prominent marginal teeth and a strong terminal spine.
+bark: n/a
+display: When they flower at the end of their life cycle, they sprout a tall, robust paniculate inflorescence with many rounded, umbel-like flower clusters. The yellow flowers have long stamens and a thick green to reddish peduncle.The flowering structure is widely spaced and tree-like.
+germ: turning yellow to red
+note1: n/a
+
+Pistacia Mexicana:
+subtitle: pistacho silvestre
+tree: Mexican pistache is characterized by their glossy green pinnate leaves. A medium to large tree (5-15m.) Widely dispersed on the hillsides, with many on the lower slopes of the Tempisque Horse trail. Unfortunately they do not produce edible pistachos.
+leaf: compound pinnate leaf, with 7–15 opposite leaflets, elliptic–oblong. Slightly leathery, glossy green. Rachis reddish to tan. Often growing fan-like from the branch tips. The leaves stay on the trees well into the dry season, providing welcome shade in hot weather. The crushed leaves have a resinous smell.
+bark: Dark gray to brown
+display: Cream white flowers become small red to black drupes (pea-sized) on female trees. 
+germ: n/a
+note1: n/a
+
+Myrtle:
+subtitle: Eugenia capuli
+tree: Aka Capulín silvestre or Arrayán __ medium sized tree, with glossy green leaves that remain on the tree into the dry season. There are several along the Copal Chino trail.
+leaf: alternate, thick, glossy, smooth margins, strongly arcuate veins (veins that curve toward the leaf tip)
+bark: rough, fissured, gray-brown on mature trunks
+display: small, white, with many long stamens
+germ: oval seeds on short stalks on older wood.
+note1: n/a
+
+Nolina:
+subtitle: Nolina longifolia
+tree: Nolina -- aka Bear grass -- is an unusual tree-like plant 3 - 5m tall,  found in the oak forest zone on or near the skyridge at 2000+m. It has a clear trunk, dark fissured bark, with a dense “skirt” of long, narrow, flexible green leaves mixed with brown dead leaves, that form a large terminal rosette.
+leaf: n/a
+bark: n/a
+display: When they are in bloom they have tall, light brown, narrow inflorescences rising well above the crown. It's not a tree, but an asparagus!
+germ: n/a
+note1: n/a
+
+Nopal:
+subtitle: Opuntia ficus-indica
+tree: Nopal -- aka prickly pear -- is the most common wild tree-forming nopal cactus, to 7 m tall, found at elevations 1600–2400 m. It has an arborescent, tree-like form with a single woody trunk and spreading crown.
+leaf: Medium-sized, oval to obovate cladodes, the spiny paddle-like, thick and succulent leaves of the plant. With the spines removed it is commonly used in mexican cuisine.
+bark: n/a
+display: Nopal with abundant red flowers in March.
+germ: n/a
+note1: n/a
+
+Papel:
+subtitle: Bursera simaruba
+tree: Papel is a large spreading tree with multi-stemmed, twisting trunks, 10-30 m. The copper-red peeling bark is characteristic. Widely dispersed at lower elevations, with many in the upper Tempisque canyon on the East slope. Common names include  Palo mulato, Chacá, Cuajiote, Papel
+leaf: leaves are spirally arranged and pinnately compound with 7-11 leaflets. Leafless or semi-leafless in the dry season
+bark: strongly exfoliating coppery-reddish brown peeling bark. Freshly exposed bark is smooth, green to olive. Often locally called Papel due to the peeling bark.
+bark2: strongly exfoliating coppery-reddish brown peeling bark. Freshly exposed bark is smooth, green to olive. Often locally called Papel due to the peeling bark.
+display: Small, creamy-white to pale green
+germ: n/a
+note1: n/a
+
+Quebracho:
+subtitle: Lysiloma divaricatum
+tree: Typically a small to medium-sized tree, densely branched, with an open spreading crown up to 15m. A much smaller tree than the related species Tepeguaje. Widely dispersed locally at lower elevations. There are many on the crosstrail west of the Capilla junction.
+leaf: Bipinnate, many small leaflets (usually 10–30+ per pinna)
+bark: Gray to brown, slightly fissured with age. Younger bark is smoother. The related Tepeguaje has much coarser fissured dark brown bark.
+display: Creamy-white, puffball-like clusters
+germ: Flat, thin, and often twisted or spiraled as they dry, 5–9 cm long. Brown at maturity. Often in large quantities, with dense clusters. They look like Tepeguaje pods but much smaller.
+note1: n/a
+
+Encino Roble:
+subtitle: Quercus rugosa
+tree: Encino Roble is a common oak at the high elevations on the skyridge. A medium sized tree, to 15 meters tall, with a broad crown, with stout, spreading limbs.
+leaf: Rugosa leaves are thick, leathery, with a strongly rugose (wrinkled/bullate) surface; irregular shallow lobing rather than sharp teeth;
+leaf3: Leaf underside is yellowish and fuzzy.
+bark: Dark gray-brown, rough and blocky on mature trees
+display: n/a
+germ: brown, fairly long with pointed tips
+note1: n/a
+
+Encino Magnolia:
+subtitle: Quercus magnoliifolia
+tree: Quercus magnoliifolia is an oak species characterized by its very large leaves 20 to 30 cm (12 in) long. A tall tree to 20 m. Found in the oak forests at higher elevations, and most common in the Hidden Valley area.
+leaf: Largest leaves of any local oak species, up to 30 cm (12 in) long. Thick, green and leathery, widely egg-shaped, wavy edges, shallowly lobed, green on the top but covered with yellowish hairs under. Venation shows a strong midrib with evenly spaced secondary veins.
+
+bark: Rough, deeply fissured bark
+display: n/a
+germ: large acorns with shallow cups, usually solitary or paired.
+note1: n/a
+
+Rock Fig:
+subtitle: Ficus petiolaris
+tree: The Rock Fig, locally Amate or Tescalame, has a distinctive cream colored trunk. A large tree to 30m, with distinctive heart shaped leaves. The Nahuatl word, Tescalame, ‘tescal’ is rock and ‘amate' is paper made from the bark.
+leaf: large, leathery, heart-shaped (cordate) leaves, dark green with pinkish-white veins and tufts of white hairs on the underside.
+bark: smooth and cream colored, wiith roots often spreading over rock surfaces
+display: n/a
+germ: Produces small, greenish figs, turning reddish with age. Like many figs, it produces a sap (ficusin) that can cause skin irritation or swelling if ingested.
+note1: The Rock Fig often grows on rocky cliffs, with roots spreading over rock faces to find moisture.
+note2: large muscular branches, forming a spreading crown on older trees.
+
+Strangler Fig:
+subtitle: Ficus cotinifolia
+tree: Locally Nacapul or Alamo, a tree with glossy leathery leaves, a robust trunk, large tree to 30 m. It starts as an epiphyte, sending roots down to envelop and constrict its host tree. 
+leaf: elliptic to obovate, thick and leathery, smooth margins, rounded to slightly pointed tips, with a strong yellowish midrib with fine lateral veins.
+bark: smooth , gray-brown bark
+display: n/a
+germ: small green figs along the stems turning reddish when ripe.
+note1: Often with exposed roots covering rocks or other trees - hence its common name, strangler fig.
+note2: It starts as an epiphyte, sending roots down to envelop and constrict its host tree. In this photo a Tepeguaje is getting enveloped by a strangler fig, which will eventually overcome the Tepeguaje.
+
+Tepeguaje:
+subtitle: Lysiloma acapulcense
+tree: Tepeguajes are the most common large apex canopy trees on the hillsides above Ajijic, with dark fissured bark and feathery bipinnate leaves. Typically grows 5-20 meters tall, sometimes reaching 30 meters. Some specimens are very large with huge spreading crowns. Trees retain their leaves well into the dry season.
+leaf: Fine, feathery, bipinnate (similar to acacia)
+bark: Bark
+display: Small, whitish, in fluffy clusters
+germ: Flat seed pods typical of legumes
+note1: big muscular limbs, forming a large spreading crown in older trees.
+
+// End of Column-row lists
+
+// Folder "My Tree Atlas" also contains either:
+// (1) All the media files needed for the atlas, 
+// named according to this convention:
+//     columnName.rowName.extension, for example:	
+//     Myrtle.tree.jpg, Tepeguate.leaf.jpg, Ceiba.bark.jpg, etc.
+// 	and, or
+// (2) Folders that contain media files needed for the atlas. 
+// (a) Each folder is named after a column, for example:  Ceiba
+// (b) Each folder contains media files for that respective column, 
+//     named after their row, for example: tree.jpg, bark.mp4, leaf.html
+
+// So, you see, it is the presence or absence of a media file
+// that determines what is shown in each cell of your atlas.
+// Images: jpg, jpeg, png, gif, webp, bmp, svg
+// Video: mp4, webm, mov
+// Audio: mp3, m4a, ogg, wav
+// Text: txt
+// HTML: html, htm
+
+
+
+
